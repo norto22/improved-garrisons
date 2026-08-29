@@ -1,0 +1,49 @@
+<Brushes>
+    <Brush Name="IGCascademenuFrame">
+        <Layers>
+            <BrushLayer Name="Default" Sprite="InnerFrame1_canvas" Color="#ff9900FF" />
+            <BrushLayer Name="Frame" ExtendTop="-2" ExtendLeft="-2" ExtendRight="-2" ExtendBottom="-2" Sprite="InnerFrame1_shadow"  OverlayMethod="CoverWithTexture" OverlaySprite="stone_texture_overlay" Color="#ffffffFF"/>
+        </Layers>
+        <Styles>
+            <Style Name="Default">
+                <BrushLayer Name="Default" />
+                <BrushLayer Name="Frame" />
+            </Style>
+        </Styles>
+    </Brush>
+
+    <Brush Name="IGPartySelectionCard">
+        <Layers>
+        <BrushLayer Name="Default" Sprite="SPGeneral\GameMenu\troop_selection_card_default" ExtendLeft="47" ExtendRight="35" ExtendTop="17" ExtendBottom="17" />
+        <BrushLayer Name="Selected" Sprite="SPGeneral\GameMenu\troop_selection_card_selected" ExtendLeft="17" ExtendRight="17" ExtendTop="17" ExtendBottom="17" />
+        </Layers>
+        <Styles>
+        <Style Name="Default">
+            <BrushLayer Name="Default" ColorFactor="1" />
+            <BrushLayer Name="Selected" IsHidden="true" />
+        </Style>
+        <Style Name="Hovered">
+            <BrushLayer Name="Default" ColorFactor="2" />
+            <BrushLayer Name="Selected" IsHidden="true" />
+        </Style>
+        <Style Name="Pressed">
+            <BrushLayer Name="Default" ColorFactor="0.8" />
+            <BrushLayer Name="Selected" IsHidden="true" />
+        </Style>
+        <Style Name="Selected">
+            <BrushLayer Name="Default" IsHidden="true" />
+            <BrushLayer Name="Selected" ColorFactor="1.8" />
+        </Style>
+        <Style Name="Disabled">
+            <BrushLayer Name="Default" AlphaFactor="0.5" />
+            <BrushLayer Name="Selected" IsHidden="true" />
+        </Style>
+        </Styles>
+        <SoundProperties>
+        <EventSounds>
+            <EventSound EventName="Click" Audio="checkbox" />
+        </EventSounds>
+        </SoundProperties>
+    </Brush>
+
+</Brushes>

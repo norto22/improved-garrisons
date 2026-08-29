@@ -1,0 +1,24 @@
+<Prefab>
+  <Constants>
+    <Constant Name="EscapeMenu.Background.Width" BrushName="EscapeMenu.Background" BrushLayer="Default" BrushValueType="Width"/>
+    <Constant Name="EscapeMenu.Background.Height" BrushName="EscapeMenu.Background" BrushLayer="Default" BrushValueType="Height"/>
+
+    <Constant Name="ContextButton.Width" BrushName="ButtonBrush2" BrushLayer="Default" BrushValueType="Width"/>
+    <Constant Name="ContextButton.Height" BrushName="ButtonBrush2" BrushLayer="Default" BrushValueType="Height"/>
+  </Constants>
+  <Window>
+    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="500" HorizontalAlignment="Right" VerticalAlignment="Top" MarginTop="140" MarginRight="20" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0">
+        <Children>
+            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" DoNotAcceptEvents="true" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                <Children>   
+                    <ImprovedGarrisonsRibbon DataSource="{FirstRibbon}"/>
+                    <ImprovedGarrisonsRibbon DataSource="{SecondRibbon}"/>
+                    <ImprovedGarrisonsRibbon DataSource="{ThirdRibbon}"/>
+                </Children>
+            </ListPanel>
+        </Children>
+      </Widget>
+      
+      
+  </Window>
+</Prefab>

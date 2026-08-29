@@ -1,0 +1,307 @@
+<Prefab>
+  <Constants>
+    <Constant Name="NavigationWidth" Value="310" />
+  </Constants>
+  <VisualDefinitions>
+    <VisualDefinition Name="Menu" EaseIn="true" TransitionDuration="0.45">
+      <VisualState PositionXOffset="950" State="Retracted" />
+      <VisualState PositionXOffset="-32" State="Expanded" />      
+    </VisualDefinition>       
+  </VisualDefinitions>
+  <Window>
+  
+      <Widget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+          <Children>
+          
+              <Widget DoNotAcceptEvents="true" Id="Overlay" VisualDefinition="Menu" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="1000" SuggestedHeight="750" VerticalAlignment="Center" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0" PositionXOffset="950" PositionYOffset="0">
+                  <Children>
+                  
+                    <!--Extend Button-->
+                    <ButtonWidget Id="ExtendButton" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="122" SuggestedWidth="52" Brush="GameMenu.Extend.Button" VerticalAlignment="Top" DoNotPassEventsToChildren="true" UpdateChildrenStates="true" MarginTop="80" MarginLeft="0" PositionXOffset="0" >
+                      <Children>
+                        <BrushWidget Id="ExtendButtonArrow" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="30" SuggestedHeight="30" VerticalAlignment="Center" MarginBottom="15" MarginLeft="20" Brush="GameMenu.Extend.Button.Arrow"/>
+                      </Children>
+                    </ButtonWidget>
+                    
+                    <BrushWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent"  HorizontalAlignment="Right" VerticalAlignment="Center" Brush="Frame1Brush" MarginLeft="60">
+                        <Children>   
+
+                            <!--Top Panel Name Text-->
+                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="500" SuggestedHeight="135" HorizontalAlignment="Center" PositionYOffset="-35" Sprite="StdAssets\tabbar_popup" IsDisabled="true">
+                              <Children>
+                                <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" MarginTop="-50" VerticalAlignment="Center" Brush="Recruitment.Popup.Title.Text" Brush.FontSize="35" IsDisabled="true" Text="@Title" />
+                              </Children>
+                            </Widget>
+                            
+                            <!--Hinges-->
+                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" VerticalAlignment="Center" HorizontalAlignment="Right" MarginRight="-33" SuggestedHeight="350" Sprite="StdAssets\game_menu_hinges"/>
+                            
+                            <!-- Main Widget Content -->
+                            <ImprovedGarrisonsUIWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Left" MarginLeft="0" MarginTop="27" MarginBottom="27" MarginRight="0" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0" Overlay="..\..\..\Overlay" ExtendButtonWidget="..\..\ExtendButton" ExtendButtonArrowWidget="..\..\ExtendButton\ExtendButtonArrow" ContentWidget="BottomWidget\ContentWidget" TabcontrolWidget="BottomWidget\ContentWidget\ScrollablePanel\MyClipRect\TabControl" >
+                                <Children>     
+                                
+                                    <!-- Top Section -->
+                                    <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" VerticalAlignment="Top" SuggestedHeight="90" >
+                                        <Children>
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" VerticalAlignment="Bottom" SuggestedHeight="7" Sprite="SPGeneral\TownManagement\title_divider" />
+                                            
+                                            <Standard.DropdownWithHorizontalControl Id="StringOption" VerticalAlignment="Center" HorizontalAlignment="Center" MarginTop="25" IsVisible="true"  Parameter.ShowNextAndPrevious="false" Parameter.SelectorDataSource="{PlayerSettlementsSelector}"/>
+                                            
+                                        </Children>
+                                    </Widget>
+                                    
+                                    <!-- Bottom Section -->
+                                    <Widget Id="BottomWidget" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Top" MarginTop="87">
+                                        <Children>
+
+                                            <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" VerticalAlignment="Top" SuggestedHeight="7" Sprite="SPGeneral\TownManagement\title_divider" />
+                                            
+                                            <!-- Navigation Section -->
+                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" VerticalAlignment="Top" SuggestedWidth="!NavigationWidth" >
+                                                <Children>                                                    
+                                                    
+                                                    <!-- Navigation Panel -->
+                                                    <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Top" LayoutImp.LayoutMethod="VerticalTopToBottom" MarginTop="20" >
+                                                      <Children>
+                                                      
+                                                        <TabToggleWidget DoNotPassEventsToChildren="true" Command.Click="ExecuteCancelProcess" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Center" Brush="Header.Tab.Center" TabControlWidget="..\..\..\ContentWidget\ScrollablePanel\MyClipRect\TabControl" TabName="OverviewTab" UpdateChildrenStates="true" MarginRight="5" MarginLeft="5">
+                                                          <Children>
+                                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PositionYOffset="1" Brush="Clan.TabControl.Text" Text="@OverviewTabText"/>
+                                                          </Children>
+                                                        </TabToggleWidget>
+
+                                                        <TabToggleWidget DoNotPassEventsToChildren="true" Command.Click="ExecuteCancelProcess" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Center" Brush="Header.Tab.Center" TabControlWidget="..\..\..\ContentWidget\ScrollablePanel\MyClipRect\TabControl" TabName="RecruitmentTab" UpdateChildrenStates="true" MarginRight="5" MarginLeft="5">
+                                                          <Children>
+                                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PositionYOffset="1" Brush="Clan.TabControl.Text" Text="@RecruitmentTabText"/>
+                                                          </Children>
+                                                        </TabToggleWidget>
+
+                                                        <TabToggleWidget DoNotPassEventsToChildren="true" Command.Click="ExecuteCancelProcess" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Center" Brush="Header.Tab.Center" TabControlWidget="..\..\..\ContentWidget\ScrollablePanel\MyClipRect\TabControl" TabName="TrainingTab" UpdateChildrenStates="true" MarginRight="5" MarginLeft="5">
+                                                          <Children>
+                                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PositionYOffset="1" Brush="Clan.TabControl.Text" Text="@TrainingTabText"/>
+                                                          </Children>
+                                                        </TabToggleWidget> 
+                                                        
+                                                        <TabToggleWidget DoNotPassEventsToChildren="true" Command.Click="ExecuteCancelProcess" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Center" Brush="Header.Tab.Center" TabControlWidget="..\..\..\ContentWidget\ScrollablePanel\MyClipRect\TabControl" TabName="GuardsTab" UpdateChildrenStates="true" MarginRight="5" MarginLeft="5">
+                                                          <Children>
+                                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PositionYOffset="1" Brush="Clan.TabControl.Text" Text="@GuardTabText"/>
+                                                          </Children>
+                                                        </TabToggleWidget> 
+
+                                                        <TabToggleWidget DoNotPassEventsToChildren="true" Command.Click="ExecuteCancelProcess" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Center" Brush="Header.Tab.Center" TabControlWidget="..\..\..\ContentWidget\ScrollablePanel\MyClipRect\TabControl" TabName="GarrisonTab" UpdateChildrenStates="true" MarginRight="5" MarginLeft="5">
+                                                          <Children>
+                                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PositionYOffset="1" Brush="Clan.TabControl.Text" Text="@GarrisonTabText"/>
+                                                          </Children>
+                                                        </TabToggleWidget> 
+
+                                                        <TabToggleWidget DoNotPassEventsToChildren="true" Command.Click="ExecuteCancelProcess" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Center" Brush="Header.Tab.Center" TabControlWidget="..\..\..\ContentWidget\ScrollablePanel\MyClipRect\TabControl" TabName="ManagementTab" UpdateChildrenStates="true" MarginRight="5" MarginLeft="5">
+                                                          <Children>
+                                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PositionYOffset="1" Brush="Clan.TabControl.Text" Text="@ManagementTabText"/>
+                                                          </Children>
+                                                        </TabToggleWidget> 
+                                                        
+
+                                                        <!--<TabToggleWidget DoNotPassEventsToChildren="true" Command.Click="ExecuteCancelProcess" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" VerticalAlignment="Center" Brush="Header.Tab.Center" TabControlWidget="..\..\..\ContentWidget\ScrollablePanel\MyClipRect\TabControl" TabName="FinanceTab" UpdateChildrenStates="true" MarginRight="5" MarginLeft="5">
+                                                          <Children>
+                                                            <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" PositionYOffset="1" Brush="Clan.TabControl.Text" Text="@FinanceTabText"/>
+                                                          </Children>
+                                                        </TabToggleWidget> -->
+
+                                                      </Children>
+                                                    </ListPanel>
+
+                                                    <!-- Information Panel -->
+                                                    <BrushWidget DataSource="{HintManagerDatasource}" HeightSizePolicy="Fixed" WidthSizePolicy="CoverChildren" SuggestedHeight="130" Brush="InnerFrameShadow1Brush" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginTop="10" MarginBottom="10">
+                                                        <Children>
+                                                          <Widget HeightSizePolicy="CoverChildren" WidthSizePolicy="CoverChildren" VerticalAlignment="Center">
+                                                            <Children>
+                                                              <ListPanel DataSource="{CurrentHint}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren"  SuggestedWidth="270" VerticalAlignment="Center" HorizontalAlignment="Center" UpdateChildrenStates="true" Sprite="BlankWhiteSquare_9" MarginLeft="10" MarginRight="10" Color="#3b2b20FF" AlphaFactor="0" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                                                                  <Children>
+
+                                                                      <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center"  >
+                                                                        <Children>
+
+                                                                          <ButtonWidget DataSource="{..}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="20" SuggestedHeight="20" HorizontalAlignment="Left" VerticalAlignment="Center" Command.Click="ExecutePreviousHint" Brush="ButtonRightArrowBrush1" Brush.GlobalColor="#ff9d00FF" MarginRight="5" />
+
+                                                                          <RichTextWidget DataSource="{..}" DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Text="@TipsText" Brush.FontSize="20" Brush.GlobalColor="#e8930088" MarginBottom="5"/>
+
+                                                                          <ButtonWidget DataSource="{..}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="20" SuggestedHeight="20" HorizontalAlignment="Right" VerticalAlignment="Center" Command.Click="ExecuteNextHint" Brush="ButtonLeftArrowBrush1" Brush.GlobalColor="#ff9d00FF" MarginLeft="5"/>
+                                                                        </Children>
+                                                                      </ListPanel>
+                                                                      
+
+                                                                      <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Center" Text="@Text" Brush="TownManagement.Description.Title.Text" Brush.FontSize="16" Brush.GlobalColor="#FFFFFFff" MarginLeft="5" MarginRight="5" />
+                                                                      
+                                                                  </Children>
+                                                              </ListPanel>
+                                                            </Children>
+                                                          </Widget>
+                                                        </Children>
+                                                    </BrushWidget>                                                
+                                                </Children>
+                                            </Widget>
+                                            
+                                            <!-- Content Section -->
+                                            <BrushWidget Id="ContentWidget" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Top" MarginLeft="!NavigationWidth" MarginRight="10" MarginTop="10" MarginBottom="10" Brush="InnerFrameShadow1Brush" ClipContents="true">
+                                                <Children>
+                                                    
+                                                    <!-- Vertical Divider -->
+                                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="7" HorizontalAlignment="Right" VerticalAlignment="Top" Sprite="SPGeneral\TownManagement\vertical_divider" AlphaFactor="0.7" VerticalFlip="true" />
+                                                    
+                                                    <ScrollablePanel Id="ScrollablePanel" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" AutoHideScrollBarHandle="true" AutoHideScrollBars="false" ClipRect="MyClipRect" InnerPanel="MyClipRect\TabControl" VerticalScrollbar="..\..\VerticalScrollbar">
+                                                      <Children>
+                                                        <Widget Id="MyClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" Brush.GlobalAlphaFactor="0.75" ClipContents="true">
+                                                          <Children>
+                                                            <TabControl Id="TabControl" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren">
+                                                              <Children>             
+
+                                                                <!--<ImprovedGarrisonsFinanceMenu Id="FinanceTab" DataSource="{FinanceDatasource}" />-->
+                                                                <ImprovedGarrisonsOverview Id="OverviewTab" DataSource="{OverviewDatasource}" />
+
+                                                                <ImprovedGarrisonsGarrisonMenu Id="GarrisonTab" DataSource="{GarrisonDatasource}" />
+
+                                                                <ImprovedGarrisonsManagementMenu Id="ManagementTab" DataSource="{ManagementDatasource}" />  
+
+                                                                <ImprovedGarrisonsTrainingMenu Id="TrainingTab" DataSource="{TrainingDatasource}" />
+
+                                                                <ImprovedGarrisonsRecruitmentMenu Id="RecruitmentTab" DataSource="{RecruitmentDatasource}" />
+
+                                                                <ImprovedGarrisonsGuardMenu Id="GuardsTab" DataSource="{GuardsDatasource}" /> 
+
+                                                                
+
+                                                              </Children>
+                                                            </TabControl>
+                                                          </Children>
+                                                        </Widget>
+                                                        <!--
+                                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="150" VerticalAlignment="Bottom" Sprite="StdAssets\Popup\scrollable_field_gradient" IsEnabled="false" /> -->
+
+                                                      </Children>
+                                                    </ScrollablePanel>
+                                                    
+                                                    <!-- <ScrollbarWidget Id="VerticalScrollbar" WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="8" HorizontalAlignment="Right" VerticalAlignment="Center" MarginTop="26" MarginBottom="85" AlignmentAxis="Vertical" Handle="VerticalScrollbarHandle" MaxValue="100" MinValue="0">
+                                                      <Children>
+                                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="4" HorizontalAlignment="Center" Sprite="MPLobby\CustomServer\lobby_slider_bed" Brush.AlphaFactor="0.4" />
+                                                        <ImageWidget Id="VerticalScrollbarHandle" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="8" SuggestedHeight="10" HorizontalAlignment="Center" Brush="FaceGen.Scrollbar.Handle" />
+                                                      </Children>
+                                                    </ScrollbarWidget> -->
+                                                
+                                                </Children>
+                                            </BrushWidget>         
+                                        </Children>
+                                    </Widget>    
+                                </Children>
+                            </ImprovedGarrisonsUIWidget>   
+
+                            <!-- Map Toggle -->
+                            <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Bottom" HorizontalAlignment="Right" UpdateChildrenStates="true" MarginBottom="-5" MarginRight="20" >
+                                <Children>
+                                    
+                                    <HintWidget DataSource="{MapToggleHint}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Right" VerticalAlignment="Center"  Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+
+                                    <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="50" HorizontalAlignment="Right" VerticalAlignment="Center" >
+                                      <Children>
+
+                                        <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="20" SuggestedHeight="20" Brush="SPOptions.Checkbox.Empty.Button" ButtonType="Toggle" IsSelected="@MapToggleValue" ToggleIndicator="ToggleIndicator" UpdateChildrenStates="true" HorizontalAlignment="Left" VerticalAlignment="Center" MarginRight="10">
+                                              <Children>
+                                                  <ImageWidget Id="ToggleIndicator" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Brush="SPOptions.Checkbox.Full.Button"  />
+                                              </Children>
+                                          </ButtonWidget>
+
+                                        <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" VerticalAlignment="Center" Brush="TownManagement.Description.Title.Text" Text="@MapToggleText" Brush.FontSize="18"/>
+
+                                      </Children>
+                                    </ListPanel>
+                                    
+                                </Children>
+                            </Widget>
+
+                            <BrushWidget HeightSizePolicy="Fixed" WidthSizePolicy="Fixed" SuggestedHeight="90" SuggestedWidth="380"  HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginTop="0" MarginRight="-85" MarginBottom="-25" >
+                              <Children>
+
+                                <!-- Tutorial Button -->
+                                <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" HorizontalAlignment="Left" UpdateChildrenStates="true" MarginBottom="0" >
+                                    <Children>
+                                        
+                                        <HintWidget DataSource="{TutorialHint}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Right" VerticalAlignment="Center"  Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+
+                                        <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="50" HorizontalAlignment="Right" VerticalAlignment="Center" >
+                                          <Children>
+
+                                            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="20" SuggestedHeight="20" Brush="SPOptions.Checkbox.Empty.Button" UpdateChildrenStates="true" HorizontalAlignment="Left" VerticalAlignment="Center" MarginRight="10" Command.Click="OnTutorialButtonClick">
+                                                  <Children>
+                                                      <ImprovedGarrisonsInfobox Parameter.HintDataSource="{TutorialHint}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                  </Children>
+                                              </ButtonWidget>
+
+                                            <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" VerticalAlignment="Center" Brush="TownManagement.Description.Title.Text" Text="@TutorialButtonText" Brush.FontSize="18"/>
+
+                                          </Children>
+                                        </ListPanel>
+                                        
+                                    </Children>
+                                </Widget>
+
+                                <!-- Configurationmanager Button -->
+                                <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" HorizontalAlignment="Center" UpdateChildrenStates="true" MarginRight="30" MarginBottom="0" >
+                                    <Children>
+                                        
+                                        <HintWidget DataSource="{ConfigmanagerHint}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Right" VerticalAlignment="Center"  Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+
+                                        <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="50" HorizontalAlignment="Right" VerticalAlignment="Center" >
+                                          <Children>
+
+                                            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="20" SuggestedHeight="20" Brush="SPOptions.Checkbox.Empty.Button" UpdateChildrenStates="true" HorizontalAlignment="Left" VerticalAlignment="Center" MarginRight="10" Command.Click="OnConfigurationButtonClick">
+                                                  <Children>
+                                                      <ImprovedGarrisonsInfobox Parameter.Symbol="C" Parameter.HintDataSource="{ConfigmanagerHint}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                  </Children>
+                                              </ButtonWidget>
+
+                                            <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" VerticalAlignment="Center" Brush="TownManagement.Description.Title.Text" Text="@ConfigurationManagerButtonText" Brush.FontSize="18"/>
+
+                                          </Children>
+                                        </ListPanel>
+                                        
+                                    </Children>
+                                </Widget>
+
+                                <!-- Reset Button -->
+                                <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" HorizontalAlignment="Right" UpdateChildrenStates="true" MarginBottom="0" >
+                                    <Children>
+                                        
+                                        <HintWidget DataSource="{ResetSettingsHint}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Right" VerticalAlignment="Center"  Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+
+                                        <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="120" SuggestedHeight="50" HorizontalAlignment="Right" VerticalAlignment="Center" >
+                                          <Children>
+
+                                            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="20" SuggestedHeight="20" Brush="SPOptions.Checkbox.Empty.Button" UpdateChildrenStates="true" HorizontalAlignment="Left" VerticalAlignment="Center" MarginRight="10" Command.Click="OnResetSettingsButtonClick">
+                                                  <Children>
+                                                      <ImprovedGarrisonsInfobox Parameter.Symbol="R" Parameter.HintDataSource="{ResetSettingsHint}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                  </Children>
+                                              </ButtonWidget>
+
+                                            <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" VerticalAlignment="Center" Brush="TownManagement.Description.Title.Text" Text="@ResetSettingsButtonText" Brush.FontSize="18"/>
+
+                                          </Children>
+                                        </ListPanel>
+                                        
+                                    </Children>
+                                </Widget>
+
+                              </Children>
+                            </BrushWidget>
+                        </Children>
+                      </BrushWidget>
+                  
+                  </Children>
+              </Widget>
+              
+              
+              
+          </Children>
+      </Widget>
+  </Window>
+</Prefab>
+
+<!-- Sprite="CharacterDeveloper\left_panel_stone"-->

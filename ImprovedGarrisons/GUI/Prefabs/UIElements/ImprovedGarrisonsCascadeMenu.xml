@@ -1,0 +1,131 @@
+<Prefab>
+
+    <Parameters>        
+    </Parameters>
+
+    <Window>
+        <ButtonWidget HeightSizePolicy="StretchToParent" WidthSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Brush.Color="#000000FF" Brush.AlphaFactor="0.0" Command.Click="CloseMenu" Command.AlternateClick="CloseMenu">
+            <Children>
+                <CascadeMenuWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="@SuggestedWidth" Brush="IGCascademenuFrame" MaxHeight="@MaxHeight"> 
+                    <Children>
+
+                        <ListPanel Id="Container" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" LayoutImp.LayoutMethod="VerticalBottomToTop" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0">
+                            <Children>
+
+                                <!-- Title -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MarginTop="15" MarginLeft="7" MarginRight="7">
+                                    <Children>
+                                        <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"  Brush="Recruitment.Popup.Title.Text" Brush.TextHorizontalAlignment="Center" Brush.FontSize="20" Text="@TitleText" /> 
+                                    </Children>
+                                </Widget>                                
+                                
+                                <ListPanel Id="Content" DataSource="{CascadeMenuElements}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" LayoutImp.LayoutMethod="VerticalBottomToTop" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0" MarginTop="5" MarginBottom="10" >
+                                    <ItemTemplate>
+
+                                        <!-- Content section-->
+                                        <CascadeMenuElementWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"  Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0" MarginTop="14" MarginBottom="14" MarginLeft="5" MarginRight="5" ExtendButtonWidget="ExtendButton" BaseButtonWidget="BaseButton" PartyListWidget="PartyList" OptionTypeID="@OptionTypeID"> 
+                                            <Children>   
+                                                
+                                                <!-- Basic Button -->
+                                                <ButtonWidget Id="BaseButton" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="8" Brush="TroopSelection.Card" Brush.AlphaFactor="1.0" MarginRight="0" IsVisible="false" Command.Click="ExecuteClick">
+                                                    <Children>
+                                                        <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="210" VerticalAlignment="Center" HorizontalAlignment="Left" MarginLeft="10" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Center" Brush.FontSize="20" Text="@Text"  /> 
+                                                    </Children>
+                                                </ButtonWidget>
+
+                                                <!-- Extend Button -->
+                                                <ButtonWidget Id="ExtendButton" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="8" Brush="TroopSelection.Card" Brush.AlphaFactor="1.0" MarginRight="0" IsVisible="false" Command.Click="ExecuteClick">
+                                                    <Children>
+                                                        <BrushWidget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="20" SuggestedHeight="20" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="ButtonRightArrowBrush1" Brush.GlobalColor="#ffffffFF" MarginLeft="10" />
+                                                        
+                                                        <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="200" VerticalAlignment="Center" HorizontalAlignment="Left" MarginLeft="40" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="20" Text="@Text" /> 
+                                                    </Children>
+                                                </ButtonWidget>  
+
+                                                <!-- Party List -->
+                                                <Widget Id="PartyList" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" MaxHeight="300" IsVisible="false">
+                                                    <Children>
+
+                                                        <BrushWidget Id="PartyList" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="IGPartySelectionCard" IsVisible="@IsEmpty">
+                                                            <Children>
+                                                                <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" HorizontalAlignment="Center" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Center" Brush.FontSize="20" Text="@EmptyText" /> 
+                                                            </Children>
+                                                        </BrushWidget>
+
+                                                        <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" AutoHideScrollBars="true" HorizontalAlignment="Center" ClipRect="ClipRect" InnerPanel="ClipRect\Panel" VerticalScrollbar="..\Scrollbar_1\Scrollbar" IsVisible="@IsNotEmpty" >
+                                                            <Children>
+                                                                <BrushWidget Id="ClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" ClipContents="true" >
+                                                                    <Children>     
+                                                                        <ListPanel Id="Panel" DataSource="{Parties}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"  HorizontalAlignment="Center" LayoutImp.LayoutMethod="VerticalBottomToTop" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0">
+                                                                            <ItemTemplate>
+                                                                                <ButtonWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="60" Brush="IGPartySelectionCard" Brush.AlphaFactor="0.6" MarginBottom="10" MarginTop="10" MarginRight="5" Command.Click="ExecuteClick">
+                                                                                    <Children>
+                                                                                        
+                                                                                        <ListPanel DoNotAcceptEvents="true" Id="Container" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0">
+                                                                                            <Children>
+                                                                                                
+                                                                                                <!-- Troop Image -->
+                                                                                                <Widget Id="Background"  WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.35" MarginLeft="15">
+                                                                                                    <Children>
+                                                                                                        
+                                                                                                        <ImageIdentifierWidget DataSource= "{Visual}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="47" SuggestedWidth="70" VerticalAlignment="Bottom" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName"   DoNotAcceptEvents="true" MarginLeft="7" MarginRight="7" MarginTop="7" />
+                                                                                                        
+                                                                                                    </Children>
+                                                                                                </Widget>
+
+                                                                                                <!-- Party Name -->
+                                                                                                <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="210" VerticalAlignment="Center" HorizontalAlignment="Center" Brush="Recruitment.Popup.Title.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="20" Text="@Name" MarginLeft="10" MarginRight="10"/> 
+
+                                                                                                <ListPanel DoNotAcceptEvents="true" Id="Container" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                                                                                                    <Children>
+                                                                                                        <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0">
+                                                                                                            <Children>
+
+                                                                                                                <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"  VerticalAlignment="Center" HorizontalAlignment="Center" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="18" Text="Size:"/> 
+
+                                                                                                                <!-- Troop Amount -->
+                                                                                                                <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"  VerticalAlignment="Center" HorizontalAlignment="Center" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="18" Text="@TroopAmount" MarginLeft="10"/> 
+                                                                                                            </Children>
+                                                                                                        </ListPanel>
+                                                                                                        
+                                                                                                        <ListPanel DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#000000FF" AlphaFactor="0.0">
+                                                                                                            <Children>
+                                                                                                                
+                                                                                                                <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"  VerticalAlignment="Center" HorizontalAlignment="Center" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="18" Text="Distance:"/>
+
+                                                                                                                <!-- Distance to settlement -->
+                                                                                                                <TextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"  VerticalAlignment="Center" HorizontalAlignment="Center" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="18" Text="@DistanceInTime" MarginLeft="10"/> 
+                                                                                                            
+                                                                                                            </Children>
+                                                                                                        </ListPanel>
+                                                                                                    </Children>
+                                                                                                </ListPanel>
+
+                                                                                            </Children>
+                                                                                        </ListPanel>
+                                                                                    </Children>
+                                                                                </ButtonWidget>
+                                                                            </ItemTemplate>
+                                                                        </ListPanel>
+                                                                    </Children>
+                                                                </BrushWidget>
+                                                            </Children>
+                                                        </ScrollablePanel>
+
+                                                        <!-- Scrollbar -->
+                                                        <Standard.VerticalScrollbar Id="Scrollbar_1" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" VerticalAlignment="Center" IsVisible="@IsNotEmpty"/>
+                                                    </Children>
+                                                </Widget>
+
+                                            </Children>
+                                        </CascadeMenuElementWidget>
+                                    </ItemTemplate>
+                                </ListPanel>
+                            </Children>
+                        </ListPanel>    
+                    </Children>
+                </CascadeMenuWidget>
+            </Children>
+        </ButtonWidget> 
+    </Window>
+</Prefab>

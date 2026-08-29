@@ -1,0 +1,16 @@
+# Development
+.devcontainer/
+.nvmrc
+.codegraph/
+build/
+tests/
+docs/
+releases/
+
+# Vanilla Reference Files
+VanillaSourceFiles/
+VanillaModuleFiles/
+
+# Agents
+.claude/
+CLAUDE.md

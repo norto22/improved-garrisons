@@ -1,0 +1,248 @@
+<Prefab>
+    <Constants>
+    </Constants>
+    <VisualDefinitions>  
+    </VisualDefinitions>
+    <Window> 
+    
+        <Widget HeightSizePolicy="StretchToParent" WidthSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+            <Children>
+
+                <!-- Left Content Section -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="300" MarginTop="10" MarginLeft="10" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                    <Children>
+
+                        <!-- Vertical Divider -->
+                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="7" HorizontalAlignment="Right" VerticalAlignment="Top" Sprite="SPGeneral\TownManagement\vertical_divider" AlphaFactor="0.7" VerticalFlip="true" />    
+
+                        <!-- Middle left content section -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="275" MarginLeft="10" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                            <Children>
+                            
+                                <!-- Title -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" VerticalAlignment="Top" >
+                                    <Children>
+                                        
+                                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="40" MarginBottom="10" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Text="@TrainingSettingsText" />
+                                
+                                        <!-- Horizontal Divider -->
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" MarginRight="20"/> 
+                                        
+                                    </Children>                            
+                                </Widget> 
+
+                            </Children>
+                        </Widget>
+
+                        <!-- Left Content Section -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" SuggestedHeight="390" VerticalAlignment="Top" MarginTop="40" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                            <Children>
+
+                                 <!-- Title 
+                                <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Top" >
+                                    <Children>
+                                    
+                                        <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" MarginBottom="10" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Text="@TrainingSettingsText" />-->
+                                
+                                        <!-- Horizontal Divider -->
+                                        <!--<Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" MarginRight="20"/>
+                                        
+                                    </Children>                            
+                                </Widget> -->
+
+                                <!-- Left Button Listpanel -->
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="328" MarginBottom="10" HorizontalAlignment="Left" >
+                                    <Children>
+
+                                        <ImprovedGarrisonsBottomListPanel Parameter.ContentDataSource="{TrainingSettingsVM}" Parameter.FontSize="20" Parameter.FrameSize="30" Parameter.FrameMarginLeft="10" Parameter.FrameMarginRight="40" Parameter.SliderFrameSize="252" Parameter.SliderFillerSize="235" Parameter.SliderButtonFrameSize="290" Parameter.EnableTopDivider="false" Parameter.TextFrameWidth="230" />
+
+                                    </Children>
+                                </Widget>
+                                
+                                <!-- Trainingslider 
+                                <BrushWidget HeightSizePolicy="CoverChildren" WidthSizePolicy="CoverChildren" Brush="InnerFrameShadow1Brush" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginTop="35" MarginRight="10">
+                                    <Children>
+                                       
+                                        <ListPanel DataSource="{WageLimitSlider}" Id="SliderOption" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="150" HorizontalAlignment="Center" VerticalAlignment="Center" MarginTop="20" MarginBottom="20" LayoutImp.LayoutMethod="VerticalBottomToTop" >
+                                            <Children>
+                                            
+                                            <HintWidget DataSource="{Hint}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+                                                  
+                                            <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="252" MarginLeft="0" Brush="SPOptions.OptionName.Text" IsEnabled="false" HorizontalAlignment="Center" VerticalAlignment="Center" Text="Improved Garrison Training" Brush.FontSize="*FontSize" DoNotAcceptEvents="true" Brush.TextHorizontalAlignment="Center" />
+                                            
+                                            <SliderWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="252" SuggestedHeight="42" VerticalAlignment="Center" HorizontalAlignment="Center" DoNotUpdateHandleSize="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="@IsDiscrete" MaxValueFloat="@Max" MinValueFloat="@Min" ValueFloat="@OptionValueAsFloat">
+                                                <Children>
+                                                
+                                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="252" SuggestedHeight="38" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="SPOptions\standart_slider_canvas" IsEnabled="false" />
+
+                                                <Widget Id="Filler" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="235" SuggestedHeight="35" VerticalAlignment="Center" HorizontalAlignment="Center" Sprite="SPOptions\standart_slider_fill" ClipContents="true">
+                                                    <Children>
+                                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="235" SuggestedHeight="35" HorizontalAlignment="Left" VerticalAlignment="Center" Sprite="SPOptions\standart_slider_fill" />
+                                                    </Children>
+                                                </Widget>
+
+                                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="290" SuggestedHeight="65" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="SPOptions\standart_slider_frame" IsEnabled="false" />
+                                                
+                                                <Widget Id="SliderHandle" DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="14" SuggestedHeight="38" HorizontalAlignment="Left" VerticalAlignment="Center" Brush="SPOptions.Slider.Handle"/>
+
+                                                <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" MarginLeft="0" Brush="SPOptions.Slider.Value.Text" IsEnabled="false" HorizontalAlignment="Center" VerticalAlignment="Center" Text="@OptionFloatValueAsString" />
+                                                
+                                                </Children>
+                                            </SliderWidget>
+                                            </Children>
+                                        </ListPanel>
+                                    </Children>
+                                </BrushWidget>   -->     
+
+                            </Children>
+                        </Widget>
+
+                    </Children>
+                </Widget>
+
+                <!-- Right Troop Listpanel -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="300" MarginBottom="5" MarginTop="10" MarginRight="9" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                    <Children>                                
+
+                        <!-- Title -->
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Top" >
+                            <Children>
+
+                                <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" MarginBottom="10" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Text="@CurrentTemplateTitleText" DoNotAcceptEvents="true" />
+                        
+                                <!-- Horizontal Divider -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" MarginLeft="10" MarginRight="10" />
+                                
+                            </Children>                            
+                        </Widget>
+
+                        <!-- Troop List -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Top" MarginTop="44" MarginBottom="135">
+                            <Children>
+
+                                <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" AutoHideScrollBars="true" VerticalAlignment="Bottom" ClipRect="ClipRect" InnerPanel="ClipRect\TroopsGrid" VerticalScrollbar="..\TroopsListScrollbar\Scrollbar" MarginBottom="20" >
+                                <Children>
+
+                                    <BrushWidget Id="ClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" ClipContents="true" Brush="Frame1Brush" >
+                                    <Children>
+
+                                        <ListPanel DataSource="{Troops}" Id="TroopsGrid" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" MarginTop="10" MarginRight="20" LayoutImp.LayoutMethod="VerticalTopToBottom" DoNotAcceptEvents="true">
+                                            <ItemTemplate>
+
+                                                <!--Troop Card-->
+                                                <ImprovedGarrisonsTroopItemWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="90" HorizontalAlignment="Center" Brush="TroopSelection.Card" IsTroopHero="@IsTroopHero" CurrentAmount="@CurrentAmount" HeroHealthParent="HeroHealthParent" Command.AlternateClick="ExecuteDelete" AddButtonWidget="AddRemoveControls\AddButtonWidget" RemoveButtonWidget="AddRemoveControls\RemoveButtonWidget"
+                                                Command.Add="ExecuteAdd" Command.Remove="ExecuteRemove" MarginLeft="10" MarginRight="10" MarginBottom="15" Brush.AlphaFactor="0.4">
+                                                <Children>
+
+                                                    <!-- Add and Remove Buttons -->
+                                                    <ListPanel Id="AddRemoveControls" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Bottom" MarginLeft="50" >
+                                                        <Children>
+
+                                                            <HintWidget DataSource="{RemoveHint}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+
+                                                            <ButtonWidget Id="AddButtonWidget" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="35" SuggestedHeight="35" HorizontalAlignment="Center" Brush="GameMenu.ManageHideoutTroops.PlusButton"/>
+                                                           
+                                                            <ButtonWidget Id="RemoveButtonWidget" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="35" SuggestedHeight="35" HorizontalAlignment="Center" Brush="GameMenu.ManageHideoutTroops.MinusButton"/>
+                                                        </Children>
+                                                    </ListPanel>
+
+                                                    <HintWidget DataSource="{RemoveHint}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint"/>
+
+                                                    <!-- Troop Image -->
+                                                    <ImageIdentifierWidget DataSource= "{Visual}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="67" SuggestedWidth="100" VerticalAlignment="Center" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" MarginLeft="20"  DoNotAcceptEvents="true" >
+                                                    <Children>
+                                                        <!-- Troop Tier -->
+                                                        <Widget DataSource="{..\TierIconData}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" SuggestedHeight="24" HorizontalAlignment="Right" VerticalAlignment="Top" PositionXOffset="-1" PositionYOffset="2" Brush.GlobalAlphaFactor="0.7" Sprite="@Text" DoNotAcceptEvents="true"/>
+                                                        <!-- Troop Icon -->
+                                                        <Widget DataSource="{..\TypeIconData}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" SuggestedHeight="24" HorizontalAlignment="Left" VerticalAlignment="Top" PositionXOffset="3" PositionYOffset="1" Brush.GlobalAlphaFactor="0.7" Sprite="@Text" />
+                                                    </Children>
+                                                    </ImageIdentifierWidget>
+
+                                                    <!-- Troop name -->
+                                                    <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="150" HorizontalAlignment="Right" VerticalAlignment="Top" Brush="GameMenu.ManageHideoutTroops.NameText" Text="@Name" MarginRight="5" MarginTop="10" DoNotAcceptEvents="true"/>
+
+                                                    <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="45" HorizontalAlignment="Right" VerticalAlignment="Bottom" MarginRight="20"> 
+                                                        <Children>
+                                                        
+                                                            <HintWidget DataSource="{TemplateAmountHint}" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" >
+                                                                <Children>
+                                                                    <!-- Troop amount-->
+                                                                    <TextWidget DataSource="{..}" Id="CurrentAmountTextWidget" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" SuggestedHeight="45" Brush="GameMenu.ManageHideoutTroops.CountText" IntText="@CurrentAmount" DoNotAcceptEvents="true"/>
+                                                                </Children>
+                                                            </HintWidget>
+
+                                                        </Children>
+                                                    </Widget>
+                                                    
+                                                    
+                                                </Children>
+                                                </ImprovedGarrisonsTroopItemWidget>
+                                                
+                                            </ItemTemplate>
+                                        </ListPanel>
+                                        <!--
+                                        <Widget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50" Sprite="SPScoreboard\leaderboard_shadow" Color="#000000FF" />
+
+                                        <Widget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50" VerticalAlignment="Bottom" Sprite="SPScoreboard\leaderboard_shadow"  Color="#000000FF" VerticalFlip="true"/> -->
+
+                                    </Children>
+                                    </BrushWidget>
+
+                                </Children>
+                                </ScrollablePanel>
+
+                                <Standard.VerticalScrollbar Id="TroopsListScrollbar" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Children>
+                        </Widget>     
+
+                        <!-- Template Buttons -->
+                        <BrushWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="143"  HorizontalAlignment="Right" Brush="Frame1.Broken.Left" VerticalAlignment="Bottom" MarginBottom="8" MarginRight="7" MarginLeft="7">
+                            <Children> 
+
+                                <ImprovedGarrisonsInfobox Parameter.HintDataSource="{TemplateManagerButtonHint}" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
+
+                                <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Bottom" HorizontalAlignment="Left" MarginRight="0">
+                                    <Children>
+                                        
+                                        <HintWidget DataSource="{EstimatedCostsHint}" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Center"  Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+
+                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="25" SuggestedHeight="25" VerticalAlignment="Bottom" Sprite="General\Icons\Coin@2x" DoNotAcceptEvents="true"  MarginTop="5"/>
+
+                                        <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="130" HorizontalAlignment="Left" VerticalAlignment="Bottom" Brush="GameMenu.ManageHideoutTroops.NameText" Text="@EstimatedTemplateCosts" MarginLeft="25" MarginTop="5" DoNotAcceptEvents="true"/> 
+
+                                    </Children>
+                                </Widget>
+                                
+
+                                <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Top" MarginBottom="5" MarginTop="5" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                                    <Children>
+
+                                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="48" SuggestedWidth="240" HorizontalAlignment="Center" VerticalAlignment="Bottom" Brush="ButtonBrush1" Command.Click="AddNewCurrentTemplateTroop" IsEnabled="true" MarginTop="5">
+                                            <Children>                        
+                                                <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="OverlayPopup.ButtonText" Brush.FontSize="20" Text="@CurrentTemplateAddTroopText" />
+                                            </Children>
+                                        </ButtonWidget> 
+
+                                        
+                                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="48" SuggestedWidth="240" HorizontalAlignment="Center" VerticalAlignment="Bottom" Brush="ButtonBrush3" Command.Click="OpenTemplateManager" IsEnabled="true" MarginTop="5">
+                                            <Children>                        
+                                                <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="OverlayPopup.ButtonText" Brush.FontSize="20" Text="@TemplateManagerText"/>
+                                            </Children>
+                                        </ButtonWidget>
+
+                                    </Children>
+                                </ListPanel>
+                            </Children>
+                        </BrushWidget> 
+                        
+
+                                         
+
+                    </Children>
+                </Widget>
+
+            </Children>
+        </Widget>
+    
+    </Window>
+</Prefab>

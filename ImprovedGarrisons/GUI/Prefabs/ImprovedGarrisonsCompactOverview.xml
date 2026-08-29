@@ -1,0 +1,148 @@
+<Prefab>
+    <Constants>
+    </Constants>
+    <VisualDefinitions>  
+    </VisualDefinitions>
+    <Window> 
+    
+        <Widget DataSource="{OverviewDatasource}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="500" SuggestedHeight="750" VerticalAlignment="Center" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.5">
+            <Children>
+            
+                <!-- Top Info Section -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0" MarginLeft="5" MarginRight="5" MarginTop="5">
+                    <Children>
+                    
+                        <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="SPOptions.OptionName.Text" Text="@OverviewTitleText" />
+                        
+                        <!-- Horizontal Divider -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" />
+
+                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="30" SuggestedWidth="30" HorizontalAlignment="Right" VerticalAlignment="Bottom" UpdateChildrenStates="true" Brush="SPOptions.Checkbox.Empty.Button" Command.Click="OnCompactModeReturnPress" MarginRight="100" >
+                            <Children>
+                                
+                                <HintWidget DataSource="{}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+                                
+                            </Children>
+                        </ButtonWidget>
+                    
+                    </Children>
+                </Widget>
+                                
+
+                <!-- Bottom Content Section -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" SuggestedHeight="350" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#999999FF" MarginLeft="8" MarginRight="8" MarginBottom="5" MarginTop="56" AlphaFactor="0.5">
+                    <Children>                      
+
+                        <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" AutoHideScrollBars="true" VerticalAlignment="Bottom" ClipRect="ClipRect" InnerPanel="ClipRect\SettlementsGrid" VerticalScrollbar="..\Scrollbar_1\Scrollbar">
+                                <Children>
+                                    <BrushWidget Id="ClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" ClipContents="true" Brush="Frame1Brush" >
+                                        <Children>
+
+                                            <!--Settlements -->
+                                            <ListPanel Id="SettlementsGrid" DataSource="{Settlements}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Left" MarginTop="5" MarginLeft="20" LayoutImp.LayoutMethod="VerticalBottomToTop" >
+                                                <ItemTemplate>
+
+                                                    <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"  Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0" MarginTop="20" >
+                                                        <Children>
+                                                           
+                                                            <BrushWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="90"   Brush="TroopSelection.Card" Brush.AlphaFactor="0.6" MarginRight="0" >
+                                                                <Children>
+                                                                    
+                                                                    <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="90" SuggestedHeight="90" Brush="Encyclopedia.SubPage.Element" Command.Click="ExecuteTrack" PositionYOffset="10" Brush.GlobalColor="@Color">
+                                                                        <Children>
+                                                                            
+                                                                            <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="80" SuggestedHeight="80" HorizontalAlignment="Center" VerticalAlignment="Center"  Sprite="@FileName" />
+
+                                                                            <HintWidget DataSource="{SettlementImageHoverHint}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />           
+
+                                                                        </Children>
+                                                                    </ButtonWidget>
+                                                                    
+                                                                    <!-- Settlement Name -->
+                                                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="200" VerticalAlignment="Top" HorizontalAlignment="Left" PositionXOffset="110" PositionYOffset="10" Brush="Recruitment.Popup.Title.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="26" Text="@NameText"/>
+
+                                                                    <!-- Settlement Attack Status -->
+                                                                    <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="200" VerticalAlignment="Top" HorizontalAlignment="Left" PositionXOffset="110" PositionYOffset="50" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="26" Text="@Status" Brush.GlobalColor="@Color" />
+                                                                    
+                                                                    <!-- Vertical Divider 
+                                                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="7" HorizontalAlignment="Center" VerticalAlignment="Top" Sprite="SPGeneral\TownManagement\vertical_divider" AlphaFactor="0.7" PositionXOffset="-20" VerticalFlip="true" /> -->
+
+                                                                    <!-- Settlement Information -->
+                                                                    <GridWidget DataSource="{SettlementInformation}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="210" MarginTop="10" PositionXOffset="120"
+                                                                    HorizontalAlignment="Center" ColumnCount="2" DefaultCellHeight="30" DefaultCellWidth="80" LayoutImp="GridLayout" MarginRight="20">
+                                                                        <ItemTemplate>   
+
+                                                                            <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" >
+                                                                            <Children>
+
+                                                                                <HintWidget DataSource="{Hint}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="80" 
+                                                                                SuggestedHeight="50" VerticalAlignment="Center" MarginLeft="5" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0" />
+
+                                                                                <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IsEnabled="false">
+                                                                                <Children>
+
+                                                                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="33" SuggestedHeight="33" VerticalAlignment="Center" Sprite="@Iconpath" DoNotAcceptEvents="true" />
+
+                                                                                    <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Right" VerticalAlignment="Center" Brush="TownManagement.Description.Value.Text" MarginLeft="10" Brush.FontSize="20" Text="@Value" DoNotAcceptEvents="true" />
+
+                                                                                </Children>
+                                                                                </ListPanel>
+                                                                            </Children>
+                                                                            </Widget>
+                                                                            
+                                                                        </ItemTemplate>
+                                                                    </GridWidget>
+                                                                    
+
+                                                                </Children>
+                                                            </BrushWidget> 
+
+                                                            <ListPanel DataSource="{Villages}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Center" PositionXOffset="100" LayoutImp.LayoutMethod="VerticalBottomToTop" MarginTop="115"> 
+                                                                <ItemTemplate>
+
+                                                                    <BrushWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="60" SuggestedWidth="400" MarginBottom="30" MarginLeft="70" Brush="TroopSelection.Card" Brush.AlphaFactor="0.4">
+                                                                        <Children>
+                                                                            <ButtonWidget DoNotPassEventsToChildren="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="70" SuggestedHeight="70" Brush="Encyclopedia.SubPage.Element" Brush.GlobalColor="@Color" Command.Click="ExecuteTrack" PositionYOffset="5">
+                                                                            <Children>
+
+                                                                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="60" SuggestedHeight="60" HorizontalAlignment="Center" VerticalAlignment="Center"  Sprite="@FileName" />
+                                                                                  
+                                                                                <HintWidget DataSource="{SettlementImageHoverHint}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />         
+
+                                                                            </Children>
+                                                                        </ButtonWidget>
+                                                                        
+                                                                        <!-- Village Name -->
+                                                                        <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="180" VerticalAlignment="Center" HorizontalAlignment="Left" PositionXOffset="90" Brush="Recruitment.Popup.Title.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="26" Text="@NameText"/>
+
+                                                                        <!-- Village Attack Status -->
+                                                                        <TextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="150" VerticalAlignment="Center" HorizontalAlignment="Right" MarginRight="0" Brush="TownManagement.Description.Value.Text" Brush.TextHorizontalAlignment="Left" Brush.FontSize="26" Text="@Status" Brush.GlobalColor="@Color"/>
+                                                                        </Children>
+                                                                        
+                                                                    </BrushWidget>
+
+                                                                </ItemTemplate>
+                                                            </ListPanel>
+
+                                                        </Children>
+                                                    </Widget>                             
+
+                                                </ItemTemplate>
+                                            </ListPanel>   
+
+                                        </Children>
+                                    </BrushWidget>
+
+                                </Children>
+                            </ScrollablePanel>
+
+                            <Standard.VerticalScrollbar Id="Scrollbar_1" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        
+                    </Children>
+                </Widget>
+                
+            </Children>
+        </Widget>
+    
+    </Window>
+</Prefab>

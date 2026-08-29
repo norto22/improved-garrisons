@@ -1,0 +1,29 @@
+<Prefab>
+  <Constants>
+    <Constant Name="EscapeMenu.Background.Width" BrushName="EscapeMenu.Background" BrushLayer="Default" BrushValueType="Width"/>
+    <Constant Name="EscapeMenu.Background.Height" BrushName="EscapeMenu.Background" BrushLayer="Default" BrushValueType="Height"/>
+
+    <Constant Name="ContextButton.Width" BrushName="ButtonBrush2" BrushLayer="Default" BrushValueType="Width"/>
+    <Constant Name="ContextButton.Height" BrushName="ButtonBrush2" BrushLayer="Default" BrushValueType="Height"/>
+  </Constants>
+  <Window>
+    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="200" SuggestedHeight="80" HorizontalAlignment="Right" VerticalAlignment="Top" MarginTop="50" MarginRight="20" >
+        <Children>
+            <BrushWidget DoNotAcceptEvents="false" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="IGRibbonFrameBrush" IsVisible="@IsVisible">
+                <Children>
+                
+                <!-- Top Panel Name Text -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedWidth="500" SuggestedHeight="80" HorizontalAlignment="Center" PositionYOffset="-27" Sprite="StdAssets\tabbar_popup" IsDisabled="true">
+                  <Children>
+                    <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" MarginTop="-27" VerticalAlignment="Center" Brush="Recruitment.Popup.Title.Text" Brush.FontSize="18" IsDisabled="true" Text="@Title" />                    
+                  </Children>
+                </Widget> 
+                
+                <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" SuggestedWidth="500" HorizontalAlignment="Left" VerticalAlignment="Center" MarginTop="50" MarginBottom="20" Brush="EncounterTextBrush" Brush.FontSize="16" Text="@Text" />
+                
+                </Children>
+            </BrushWidget>
+        </Children>
+      </Widget>
+  </Window>
+</Prefab>

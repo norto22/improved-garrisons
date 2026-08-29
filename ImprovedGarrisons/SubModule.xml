@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Module>
+    <Name value="Improved Garrisons"/>
+    <Id value="ImprovedGarrisons"/>
+    <Version value="v1.0.0"/>
+    <SingleplayerModule value="true" />
+    <MultiplayerModule value="false" />
+    <ModuleType value="Official" />
+
+    <DependedModules>
+        <DependedModule Id="Native" DependentVersion="v1.4.8" Optional="false" />
+        <DependedModule Id="SandBoxCore" DependentVersion="v1.4.8" Optional="false" />
+        <DependedModule Id="Sandbox" DependentVersion="v1.4.8" Optional="false" />
+        <DependedModule Id="StoryMode" DependentVersion="v1.4.8" Optional="true" />
+        <DependedModule Id="Coop" DependentVersion="v0.1.3" Optional="true" />
+    </DependedModules>
+
+    <SubModules>
+        <SubModule>
+            <Name value="Improved Garrisons (Client)"/>
+            <DLLName value="ImprovedGarrisons.dll"/>
+            <SubModuleClassType value="ImprovedGarrisons.Main"/>
+            <Tags>
+                <Tag key="DedicatedServerType" value="none" />
+                <Tag key="IsNoRenderModeElement" value="false" />
+            </Tags>
+        </SubModule>
+        <SubModule>
+            <Name value="Improved Garrisons (Dedicated Server)"/>
+            <DLLName value="ImprovedGarrisons.dll"/>
+            <SubModuleClassType value="ImprovedGarrisons.Main"/>
+            <Tags>
+                <Tag key="DedicatedServerType" value="custom" />
+                <Tag key="IsNoRenderModeElement" value="true" />
+            </Tags>
+        </SubModule>
+    </SubModules>
+
+    <Xmls/>
+</Module>

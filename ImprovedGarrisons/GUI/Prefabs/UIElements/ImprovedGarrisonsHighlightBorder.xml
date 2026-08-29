@@ -1,0 +1,26 @@
+<Prefab>
+    <Constants>
+    </Constants>
+    <VisualDefinitions>  
+    </VisualDefinitions>
+    <Window> 
+    
+        <Widget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="@Width" SuggestedHeight="@Height" VerticalAlignment="Top" PositionXOffset="@PositionXOffset" PositionYOffset="@PositionYOffset" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#FFFFFFFF" AlphaFactor="0">
+            <Children>
+                <!-- Top Border -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="4" VerticalAlignment="Top" HorizontalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#db0000ff" AlphaFactor="1" />
+
+                <!-- Bottom Border -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="4" VerticalAlignment="Bottom" HorizontalAlignment="Center" Sprite="BlankWhiteSquare_9" Color="#db0000ff" AlphaFactor="1" />
+                
+                <!-- Right Border -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="4" VerticalAlignment="Center" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#db0000ff" AlphaFactor="1" />
+
+                <!-- Right Border -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="4" VerticalAlignment="Center" HorizontalAlignment="Left" Sprite="BlankWhiteSquare_9" Color="#db0000ff" AlphaFactor="1" />
+                        
+            </Children> 
+        </Widget>
+    
+    </Window>
+</Prefab>

@@ -1,0 +1,248 @@
+<Prefab>
+    <Constants>
+    </Constants>
+    <VisualDefinitions>  
+    </VisualDefinitions>
+    <Window> 
+    
+        <Widget HeightSizePolicy="StretchToParent" WidthSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+            <Children>
+
+                <!-- Left Content Section -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="300" MarginTop="10" MarginLeft="10" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                    <Children>
+
+                        <!-- Vertical Divider -->
+                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="7" HorizontalAlignment="Right" VerticalAlignment="Top" Sprite="SPGeneral\TownManagement\vertical_divider" AlphaFactor="0.7" VerticalFlip="true" />  
+
+                        <!-- Middle left content section -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="275" MarginLeft="10" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                            <Children>
+                            
+                                <!-- Title -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" VerticalAlignment="Top" >
+                                    <Children>
+                                        
+                                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="40" MarginBottom="10" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Text="@WeeklyInformationText" />
+                                
+                                        <!-- Horizontal Divider -->
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" MarginRight="20"/> 
+                                        
+                                    </Children>                            
+                                </Widget> 
+
+                                <ListPanel DataSource="{GarrisonInformation}" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" MarginTop="50" LayoutImp.LayoutMethod="VerticalBottomToTop" >
+                                    <ItemTemplate>
+
+                                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren">
+                                        <Children>
+
+                                            <HintWidget DataSource="{Hint}" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="30" VerticalAlignment="Center" MarginLeft="5" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" /> 
+
+                                            <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" IsEnabled="false" MarginBottom="5" >
+                                                <Children>
+
+                                                    <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="40" SuggestedHeight="40" VerticalAlignment="Center" Sprite="@Iconpath" DoNotAcceptEvents="true" MarginRight="10"/>
+
+                                                    <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="100" HorizontalAlignment="Right" VerticalAlignment="Center" Brush="TownManagement.Description.Title.Text" MarginLeft="10" Brush.FontSize="20" Text="@Description" Brush.TextHorizontalAlignment="Left" DoNotAcceptEvents="true" />
+
+                                                    <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="90"  HorizontalAlignment="Right" VerticalAlignment="Center" Brush="TownManagement.Description.Value.Text" MarginLeft="20" Brush.FontSize="20" Text="@Value" Brush.TextHorizontalAlignment="Left" DoNotAcceptEvents="true" />
+
+                                                </Children>
+                                            </ListPanel>
+                                        </Children>
+                                        </Widget>
+
+                                    </ItemTemplate>
+                                </ListPanel>
+
+                            </Children>
+                        </Widget>
+
+                        <!-- Bottom Left Content Section -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="320" VerticalAlignment="Bottom" MarginTop="40" >
+                            <Children>
+
+                                 <!-- Title -->
+                                <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Top" >
+                                    <Children>
+                                    
+                                        <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" MarginBottom="10" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Text="@GarrisonActivityLogText" />
+                                
+                                        <!-- Horizontal Divider -->
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" MarginRight="20"/>
+                                        
+                                    </Children>                            
+                                </Widget>
+
+                                <!-- Left Button Listpanel -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" SuggestedWidth="328" MarginBottom="0" HorizontalAlignment="Left" MarginTop="45">
+                                    <Children>
+                                        <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" AutoHideScrollBars="true" VerticalAlignment="Bottom" ClipRect="ClipRect" InnerPanel="ClipRect\log" VerticalScrollbar="..\LogEntriesScrollbar\Scrollbar" MarginBottom="0" >
+                                            <Children>
+
+                                                <BrushWidget Id="ClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" ClipContents="true" Brush="Frame1Brush" >
+                                                    <Children>
+
+                                                        <!-- Activity log-->
+                                                        <ListPanel DataSource="{LogEntries}" Id="log" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" MarginBottom="10" MarginTop="10" MarginRight="25" MarginLeft="5" LayoutImp.LayoutMethod="VerticalTopToBottom" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                                                            <ItemTemplate>
+
+                                                                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="48" SuggestedWidth="240" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="ButtonBrush2" MarginTop="0" MarginBottom="10" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                                                                    <Children>   
+
+                                                                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="GameMenu.InfoText" Brush.FontSize="19" Text="@Time" />
+
+                                                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" VerticalAlignment="Bottom" HorizontalAlignment="Center" SuggestedHeight="3" SuggestedWidth="550" Sprite="SPGeneral\TownManagement\title_divider" />    
+
+                                                                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="GameMenu.InfoText" Command.LinkClick="ExecuteLink" Brush.FontSize="19" Text="@Description" />
+
+                                                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" VerticalAlignment="Bottom" HorizontalAlignment="Center" SuggestedHeight="3" SuggestedWidth="550" Sprite="SPGeneral\TownManagement\title_divider" />
+
+                                                                    </Children>
+                                                                </ListPanel> 
+
+                                                                
+
+                                                            </ItemTemplate>
+                                                        </ListPanel>
+                                                    </Children>
+                                                </BrushWidget>
+
+                                            </Children>
+                                        </ScrollablePanel>
+
+                                        <Standard.VerticalScrollbar Id="LogEntriesScrollbar" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" VerticalAlignment="Center" />
+
+                                    </Children>
+                                </Widget>
+
+                            </Children>
+                        </Widget>
+
+                    </Children>
+                </Widget>
+
+                <!-- Right Troop Listpanel -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="300" MarginBottom="5" MarginTop="10" MarginRight="9" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                    <Children>                                
+
+                        <!-- Title -->
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Top" >
+                            <Children>
+
+                                <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" MarginBottom="10" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Text="@CurrentGarrisonTitle" DoNotAcceptEvents="true" />
+                        
+                                <!-- Horizontal Divider -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" MarginLeft="10" MarginRight="10" />
+                                
+                            </Children>                            
+                        </Widget>
+
+                        <!-- Troop List -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" VerticalAlignment="Top" MarginTop="44" MarginBottom="75">
+                            <Children>
+
+                                <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" AutoHideScrollBars="true" VerticalAlignment="Bottom" ClipRect="ClipRect" InnerPanel="ClipRect\TroopsGrid" VerticalScrollbar="..\TroopsListScrollbar\Scrollbar" MarginBottom="30" >
+                                <Children>
+
+                                    <BrushWidget Id="ClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" VerticalAlignment="Center" ClipContents="true" Brush="Frame1Brush" >
+                                    <Children>
+
+                                        <ListPanel DataSource="{GarrisonTroops}" Id="TroopsGrid" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" MarginTop="10" MarginRight="20" LayoutImp.LayoutMethod="VerticalTopToBottom" DoNotAcceptEvents="true">
+                                            <ItemTemplate>
+
+                                                <!--Troop Card-->
+                                                <ImprovedGarrisonsTroopItemWidget DoNotAcceptEvents="true"  WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="90" HorizontalAlignment="Center" Brush="TroopSelection.Card" IsTroopHero="@IsTroopHero" CurrentAmount="@CurrentAmount" HeroHealthParent="HeroHealthParent" Command.AlternateClick="ExecuteDelete" AddButtonWidget="AddRemoveControls\AddButtonWidget" RemoveButtonWidget="AddRemoveControls\RemoveButtonWidget"
+                                                Command.Add="ExecuteAdd" Command.Remove="ExecuteRemove" MarginLeft="10" MarginRight="10" MarginBottom="15" Brush.AlphaFactor="0.4">
+                                                <Children>
+
+                                                    <!-- Troop Image -->
+                                                    <ImageIdentifierWidget DataSource= "{Visual}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="67" SuggestedWidth="100" VerticalAlignment="Center" AdditionalArgs="@AdditionalArgs" ImageId="@Id" TextureProviderName="@TextureProviderName" MarginLeft="20"  DoNotAcceptEvents="true" >
+                                                    <Children>
+                                                        <!-- Troop Tier -->
+                                                        <Widget DataSource="{..\TierIconData}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" SuggestedHeight="24" HorizontalAlignment="Right" VerticalAlignment="Top" PositionXOffset="-1" PositionYOffset="2" Brush.GlobalAlphaFactor="0.7" Sprite="@Text" DoNotAcceptEvents="true"/>
+                                                        <!-- Troop Icon -->
+                                                        <Widget DataSource="{..\TypeIconData}" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="24" SuggestedHeight="24" HorizontalAlignment="Left" VerticalAlignment="Top" PositionXOffset="3" PositionYOffset="1" Brush.GlobalAlphaFactor="0.7" Sprite="@Text" />
+                                                    </Children>
+                                                    </ImageIdentifierWidget>
+
+                                                    <!-- Troop name -->
+                                                    <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="140" HorizontalAlignment="Right" VerticalAlignment="Top" Brush="GameMenu.ManageHideoutTroops.NameText" Text="@Name" MarginRight="20" MarginTop="10" DoNotAcceptEvents="true" />
+
+                                                    <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="45" HorizontalAlignment="Right" VerticalAlignment="Bottom" MarginRight="20"> 
+                                                        <Children>
+                                                            <!-- Troop amount-->
+                                                            <HintWidget DataSource="{GarrisonAmountHint}" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" >
+                                                                <Children>
+                                                                    <!-- Troop amount-->
+                                                                    <TextWidget DataSource="{..}" Id="CurrentAmountTextWidget" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" SuggestedHeight="45" Brush="GameMenu.ManageHideoutTroops.CountText" IntText="@CurrentAmount" DoNotAcceptEvents="true"/>
+                                                                </Children>
+                                                            </HintWidget>
+
+                                                        </Children>
+                                                    </Widget>
+                                                    
+                                                    
+                                                </Children>
+                                                </ImprovedGarrisonsTroopItemWidget>
+                                                
+                                            </ItemTemplate>
+                                        </ListPanel>
+                                        <!--
+                                        <Widget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50" Sprite="SPScoreboard\leaderboard_shadow" Color="#000000FF" />
+
+                                        <Widget DoNotAcceptEvents="true" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50" VerticalAlignment="Bottom" Sprite="SPScoreboard\leaderboard_shadow"  Color="#000000FF" VerticalFlip="true"/> -->
+
+                                    </Children>
+                                    </BrushWidget>
+
+                                </Children>
+                                </ScrollablePanel>
+
+                                <Standard.VerticalScrollbar Id="TroopsListScrollbar" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Children>
+                        </Widget>  
+
+                         <!-- Transfer Button -->
+                        <BrushWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren"  HorizontalAlignment="Right" Brush="Frame1.Broken.Left" VerticalAlignment="Bottom" MarginBottom="8" MarginRight="7" MarginLeft="7">
+                            <Children> 
+
+                                <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" MarginBottom="30" MarginTop="10" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                                    <Children>
+
+                                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="48" SuggestedWidth="240" HorizontalAlignment="Center" VerticalAlignment="Bottom" Brush="ButtonBrush1" Command.Click="ExecuteTransfer" IsEnabled="true" MarginTop="10">
+                                            <Children>                        
+                                                <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="OverlayPopup.ButtonText" Brush.FontSize="20" Text="@TransferTroopsText" />
+                                            </Children>
+                                        </ButtonWidget> 
+
+                                    </Children>
+                                </ListPanel>
+
+                                <ImprovedGarrisonsQuestionmark Parameter.HintDataSource="{TransferButtonHint}" VerticalAlignment="Top" HorizontalAlignment="Left" />
+
+                            </Children>
+                        </BrushWidget>    
+
+                        <!-- Daily wages text-->
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Bottom" HorizontalAlignment="Left" MarginLeft="7" MarginBottom="8">
+                            <Children>
+                                
+                                <HintWidget DataSource="{DailyWageHint}" WidthSizePolicy="CoverChildren" HeightSizePolicy="Fixed" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Center"  Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+
+                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="25" SuggestedHeight="25" VerticalAlignment="Bottom" Sprite="General\Icons\Coin@2x" DoNotAcceptEvents="true"  MarginTop="5"/>
+
+                                <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="130" HorizontalAlignment="Left" VerticalAlignment="Bottom" Brush="GameMenu.ManageHideoutTroops.NameText" Text="@DailyWageOfGarrison" MarginLeft="25" MarginTop="5" DoNotAcceptEvents="true"/> 
+
+                            </Children>
+                        </Widget>      
+
+                    </Children>
+                </Widget>
+
+            </Children>
+        </Widget>
+    
+    </Window>
+</Prefab>

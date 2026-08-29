@@ -1,0 +1,23 @@
+<Prefab>
+
+    <Parameters>
+        <Parameter Name="HintDataSource" DefaultValue="HintDataSource" />
+        <Parameter Name="Symbol" DefaultValue="?" />
+    </Parameters>
+
+    <Window>
+        <Widget HeightSizePolicy="CoverChildren" WidthSizePolicy="CoverChildren">
+            <Children>
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="30" SuggestedWidth="30" VerticalAlignment="Bottom" UpdateChildrenStates="true" Sprite="SPGeneral\SPOptions\checkbox_full" >
+                    <Children>
+                        
+                        <HintWidget DataSource="*HintDataSource" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" Command.HoverBegin="ExecuteBeginHint" Command.HoverEnd="ExecuteEndHint" />
+                        
+                        <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren"  HorizontalAlignment="Center" VerticalAlignment="Center" Text="*Symbol" Brush.FontSize="16" Brush.GlobalColor="#e89300ff" MarginBottom="2"/>
+                        
+                    </Children>
+                </Widget>
+            </Children>
+        </Widget>
+    </Window>
+</Prefab>

@@ -1,0 +1,118 @@
+<Prefab>
+    <Constants>
+    </Constants>
+    <VisualDefinitions>  
+    </VisualDefinitions>
+    <Window> 
+    
+        <Widget HeightSizePolicy="StretchToParent" WidthSizePolicy="StretchToParent" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+            <Children>
+                
+                <!-- Top Info Panel -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="50" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0" MarginLeft="5" MarginRight="5" MarginTop="5">
+                    <Children>
+                    
+                        <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="GameMenu.InfoText" Command.LinkClick="ExecuteLink" Brush.FontSize="24" Text="@GuardStatus" />
+
+                        <!-- <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="SPOptions.OptionName.Text" Text="@GuardStatus" /> -->
+                        
+                        <!-- Horizontal Divider -->
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" />
+                    
+                    </Children>
+                </Widget>
+                
+                <!-- Middle left content section -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="275" SuggestedWidth="300" MarginTop="50" MarginLeft="10" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                    <Children>
+                    
+                        <!-- Title -->
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Top" MarginTop="5" >
+                            <Children>
+                            
+                                <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" MarginBottom="10" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Text="@GuardInfoText" />
+                        
+                                <!-- Horizontal Divider -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" />
+                                
+                            </Children>                            
+                        </Widget>     
+
+                        <!-- Guard Information Panel -->
+                        <ListPanel DataSource="{GuardInformation}" WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="200" LayoutImp.LayoutMethod="VerticalTopToBottom" MarginTop="50" MarginLeft="10" >
+                            <ItemTemplate>
+
+                                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" IsEnabled="false" MarginBottom="5" >
+                                    <Children>
+                                        
+                                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="40" SuggestedHeight="40" VerticalAlignment="Center" Sprite="@Iconpath" DoNotAcceptEvents="true" MarginRight="10"/>
+
+                                        <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="160" HorizontalAlignment="Right" VerticalAlignment="Center" Brush="TownManagement.Description.Title.Text" Brush.FontSize="20" Text="@Text" Brush.TextHorizontalAlignment="Left" />
+                                    
+                                        <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="60" HorizontalAlignment="Right" VerticalAlignment="Center" Brush="TownManagement.Description.Value.Text" Brush.FontSize="20" Text="@Value" Brush.TextHorizontalAlignment="Left" MarginLeft="20"/>
+
+                                    </Children>
+                                </ListPanel>                                
+                            
+                            </ItemTemplate>
+                        </ListPanel>
+
+                        <!-- Guard Creation Button -->
+                        <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="48" SuggestedWidth="240" HorizontalAlignment="Center" VerticalAlignment="Bottom" Brush="ButtonBrush1" Command.Click="OnCreateGuardButtonPress" IsEnabled="@HasNoActiveGuard">
+                            <Children>                        
+                                <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="OverlayPopup.ButtonText" Brush.FontSize="20" Text="@CreateGuardText" />
+                            </Children>
+                        </ButtonWidget> 
+                        
+                        <!-- Vertical Divider -->
+                        <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="7" HorizontalAlignment="Right" VerticalAlignment="Top" Sprite="SPGeneral\TownManagement\vertical_divider" AlphaFactor="0.7" VerticalFlip="true" />
+                    
+                    </Children>
+                </Widget>
+                
+                <!-- Middle right content section -->
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="275" SuggestedWidth="300" MarginTop="50" MarginRight="10" HorizontalAlignment="Right" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                    <Children>
+                        
+                        <!-- Title -->
+                        <Widget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" VerticalAlignment="Top" MarginTop="5" >
+                            <Children>
+                            
+                                <RichTextWidget WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" SuggestedHeight="40" MarginBottom="10" HorizontalAlignment="Center" VerticalAlignment="Top" Brush="Recruitment.Popup.Title.Text" Text="@GuardOrdersTitleText" />
+                        
+                                <!-- Horizontal Divider -->
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" HorizontalAlignment="Right" VerticalAlignment="Bottom" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" />
+                                
+                            </Children>                           
+                        </Widget>                        
+                    
+                        <ListPanel DataSource="{GuardOrders}" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Center" LayoutImp.LayoutMethod="VerticalTopToBottom" MarginTop="50">
+                            <ItemTemplate>
+                            
+                                <ButtonWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedHeight="48" SuggestedWidth="240" HorizontalAlignment="Center" VerticalAlignment="Bottom" Brush="ButtonBrush2" Command.Click="OnPress" IsEnabled="true" MarginTop="10">
+                                    <Children>                        
+                                        <RichTextWidget DoNotAcceptEvents="true" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center" VerticalAlignment="Center" Brush="OverlayPopup.ButtonText" Brush.FontSize="20" Text="@ButtonText" />
+                                    </Children>
+                                </ButtonWidget> 
+                                
+                            </ItemTemplate>
+                        </ListPanel>
+                        
+                        
+                    </Children>
+                </Widget>
+
+                <!-- Bottom Content Section -->
+                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="250" VerticalAlignment="Bottom" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                    <Children>
+                    
+                        <ImprovedGarrisonsBottomListPanel Parameter.ContentDataSource="{GuardSettings}" />
+                        
+                    </Children>
+                </Widget>
+                
+            </Children>
+        </Widget>
+    
+    </Window>
+</Prefab>
