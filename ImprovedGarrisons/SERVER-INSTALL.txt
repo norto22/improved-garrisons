@@ -1,4 +1,4 @@
-Improved Garrisons v1.0.2 - BannerlordCoop dedicated server
+Improved Garrisons v1.0.4 - BannerlordCoop dedicated server
 ===========================================================
 
 This package is one custom Bannerlord module. Do not install CoopModPatch or
@@ -73,16 +73,33 @@ Replace both sides together whenever updating: BannerlordCoop excludes Official
 modules from its version comparison, so it cannot detect an older Improved
 Garrisons client by itself.
 
-Starting with v1.0.2, the Improved Garrisons server sends no custom state or
-health packets until that client completes the Improved Garrisons compatibility
-hello and then reports Coop's CampaignReady event. This keeps an absent, older,
-or still-loading client from disrupting Coop's connection and host-save loading
-phases. A matching pair logs "campaign-ready Improved Garrisons peer
-registered" on the server and "client/server compatibility verified" on the
-client before configuration synchronization begins. The client leaves native
-MobileParty registry activation and lifetime patching to BannerlordCoop during
-its normal CampaignReady processing; only the server performs IG's readiness
-verification and repair.
+Starting with v1.0.3, Improved Garrisons uses BannerlordCoop's existing
+dedicated-server connection state as the only campaign-readiness authority. The
+client does not depend on a one-shot CampaignReady event and there is no second
+Improved Garrisons readiness handshake. The dedicated server accepts intents
+and sends configuration, state, manifests, or health only after Coop's own
+IConnectionCollection reports that peer has completed campaign
+synchronization. All Improved Garrisons messages travel through Coop's INetwork
+and IMessageBroker; there is no separate socket, listener, or server process.
+
+The small version hello remains necessary because this appliance requires the
+module to be marked Official and Coop excludes Official modules from its normal
+module-version comparison. The dedicated server ignores that hello until Coop
+reports the peer fully synchronized. A matching pair then logs "compatible
+Improved Garrisons peer registered" on the server and "client/server
+compatibility verified" on the client before configuration synchronization.
+Only the dedicated server performs IG's native MobileParty readiness check and
+repair; clients use Coop's normal replicated lifetime data.
+
+Starting with v1.0.4, server action results use BannerlordCoop's existing
+SendInformationMessage command, so accepted and rejected Improved Garrisons
+actions are visible to the requesting client without an IG acknowledgement or
+retry protocol. Guard fortification and recruiter-culture conversation choices
+are forwarded as typed intents through Coop's INetwork. The existing party
+manifest also carries read-only guard/recruiter status text; native party
+movement, rosters, inventory, ownership, and lifetime remain exclusively
+BannerlordCoop data. The unused TransferBegin/TransferCommit/TransferAbort
+session protocol was removed; the supported transfer flow is TransferDirect.
 
 Acceptance check
 ----------------
