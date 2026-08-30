@@ -1,0 +1,35 @@
+# Module metadata and installation documentation
+ImprovedGarrisons/SubModule.xml
+ImprovedGarrisons/SERVER-INSTALL.txt
+ImprovedGarrisons/ServerInstall/DedicatedServer.Windows.SubModule.xml
+
+# Runtime data
+ImprovedGarrisons/ModuleData/language_data.xml
+
+# Client and server binaries
+ImprovedGarrisons/bin/Win64_Shipping_Client/ImprovedGarrisons.dll
+ImprovedGarrisons/bin/Win64_Shipping_Client/ImprovedGarrisons.CoopBootstrap.dll
+ImprovedGarrisons/bin/Win64_Shipping_Client/Adapters/ImprovedGarrisons.CoopIntegration.dll
+ImprovedGarrisons/bin/Win64_Shipping_Server/ImprovedGarrisons.dll
+ImprovedGarrisons/bin/Win64_Shipping_Server/ImprovedGarrisons.CoopBootstrap.dll
+ImprovedGarrisons/bin/Win64_Shipping_Server/Adapters/ImprovedGarrisons.CoopIntegration.dll
+
+# UI assets
+ImprovedGarrisons/GUI/Brushes/ImprovedGarrisonsBrushes.xml
+ImprovedGarrisons/GUI/Prefabs/ImprovedGarrisonsCategory.xml
+ImprovedGarrisons/GUI/Prefabs/ImprovedGarrisonsCompactOverview.xml
+ImprovedGarrisons/GUI/Prefabs/ImprovedGarrisonsConfigScreen.xml
+ImprovedGarrisons/GUI/Prefabs/ImprovedGarrisonsMenu.xml
+ImprovedGarrisons/GUI/Prefabs/ImprovedGarrisonsRibbon.xml
+ImprovedGarrisons/GUI/Prefabs/ImprovedGarrisonsRibbonManager.xml
+ImprovedGarrisons/GUI/Prefabs/ImprovedGarrisonsTutorial.xml
+ImprovedGarrisons/GUI/Prefabs/UIElements/ImprovedGarrisonsBottomListPanel.xml
+ImprovedGarrisons/GUI/Prefabs/UIElements/ImprovedGarrisonsCascadeMenu.xml
+ImprovedGarrisons/GUI/Prefabs/UIElements/ImprovedGarrisonsHighlightBorder.xml
+ImprovedGarrisons/GUI/Prefabs/UIElements/ImprovedGarrisonsInfobox.xml
+ImprovedGarrisons/GUI/Prefabs/UITabs/ImprovedGarrisonsGarrisonMenu.xml
+ImprovedGarrisons/GUI/Prefabs/UITabs/ImprovedGarrisonsGuardMenu.xml
+ImprovedGarrisons/GUI/Prefabs/UITabs/ImprovedGarrisonsManagementMenu.xml
+ImprovedGarrisons/GUI/Prefabs/UITabs/ImprovedGarrisonsOverview.xml
+ImprovedGarrisons/GUI/Prefabs/UITabs/ImprovedGarrisonsRecruitmentMenu.xml
+ImprovedGarrisons/GUI/Prefabs/UITabs/ImprovedGarrisonsTrainingMenu.xml

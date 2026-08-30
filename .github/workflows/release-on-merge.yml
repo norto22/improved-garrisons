@@ -1,0 +1,70 @@
+name: Release merged pull request
+
+on:
+  pull_request:
+    branches:
+      - live
+    types:
+      - closed
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-live
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Package and publish release
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out merged commit
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+
+      - name: Package allowlisted module files
+        id: package
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          module_version="$(sed -n 's/.*<Version value="\(v[^"]*\)".*/\1/p' ImprovedGarrisons/SubModule.xml | head -n 1)"
+          release_tag="${module_version}-pr${PR_NUMBER}"
+          release_archive="$(bash scripts/package-release.sh dist "$release_tag")"
+
+          {
+            echo "module_version=$module_version"
+            echo "release_tag=$release_tag"
+            echo "release_archive=$release_archive"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
+          MODULE_VERSION: ${{ steps.package.outputs.module_version }}
+          RELEASE_ARCHIVE: ${{ steps.package.outputs.release_archive }}
+          RELEASE_TAG: ${{ steps.package.outputs.release_tag }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_title="Improved Garrisons ${MODULE_VERSION} (PR #${PR_NUMBER})"
+
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "${RELEASE_ARCHIVE}#Client and dedicated-server module" --clobber
+            gh release edit "$RELEASE_TAG" --title "$release_title" --latest
+          else
+            gh release create "$RELEASE_TAG" \
+              "${RELEASE_ARCHIVE}#Client and dedicated-server module" \
+              --target "$MERGE_SHA" \
+              --title "$release_title" \
+              --generate-notes \
+              --latest
+          fi
