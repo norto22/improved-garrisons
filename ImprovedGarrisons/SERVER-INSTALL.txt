@@ -1,4 +1,4 @@
-Improved Garrisons v1.0.0 - BannerlordCoop dedicated server
+Improved Garrisons v1.0.1 - BannerlordCoop dedicated server
 ===========================================================
 
 This package is one custom Bannerlord module. Do not install CoopModPatch or
@@ -69,6 +69,16 @@ Client install
 
 Copy the same complete ImprovedGarrisons folder under the client's Bannerlord
 Modules directory. Client and server DLLs in this package are byte-identical.
+Replace both sides together whenever updating: BannerlordCoop excludes Official
+modules from its version comparison, so it cannot detect an older Improved
+Garrisons client by itself.
+
+Starting with v1.0.1, the Improved Garrisons server sends no custom state or
+health packets until that client completes the Improved Garrisons compatibility
+hello. This keeps an absent or older client from disrupting Coop's connection
+validation. A matching pair logs "compatible Improved Garrisons peer
+registered" on the server and "client/server compatibility verified" on the
+client before configuration synchronization begins.
 
 Acceptance check
 ----------------
