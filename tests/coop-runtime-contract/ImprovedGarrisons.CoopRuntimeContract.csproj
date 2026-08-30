@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+    <ModuleRoot Condition="'$(ModuleRoot)' == ''">$(MSBuildThisFileDirectory)../../ImprovedGarrisons</ModuleRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="host/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="ImprovedGarrisons.CoopIntegration">
+      <HintPath>$(ModuleRoot)/bin/Win64_Shipping_Client/Adapters/ImprovedGarrisons.CoopIntegration.dll</HintPath>
+    </Reference>
+    <Reference Include="ImprovedGarrisons">
+      <HintPath>$(ModuleRoot)/bin/Win64_Shipping_Client/ImprovedGarrisons.dll</HintPath>
+    </Reference>
+    <Reference Include="Common">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Common.dll</HintPath>
+    </Reference>
+    <Reference Include="GameInterface">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/GameInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="Coop.Core">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Coop.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="LiteNetLib">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/LiteNetLib.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net.Core">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/protobuf-net.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="TaleWorlds.Core">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="TaleWorlds.CampaignSystem">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="TaleWorlds.Library">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.Library.dll</HintPath>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll</HintPath>
+    </Reference>
+    <Reference Include="TaleWorlds.ObjectSystem">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll</HintPath>
+    </Reference>
+    <Reference Include="TaleWorlds.Localization">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.Localization.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
