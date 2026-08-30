@@ -1,7 +1,5 @@
-# Module metadata and installation documentation
+# Module metadata
 ImprovedGarrisons/SubModule.xml
-ImprovedGarrisons/SERVER-INSTALL.txt
-ImprovedGarrisons/ServerInstall/DedicatedServer.Windows.SubModule.xml
 
 # Runtime data
 ImprovedGarrisons/ModuleData/language_data.xml
