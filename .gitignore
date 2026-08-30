@@ -6,6 +6,7 @@ build/
 tests/
 docs/
 releases/
+.env
 
 # Vanilla Reference Files
 VanillaSourceFiles/

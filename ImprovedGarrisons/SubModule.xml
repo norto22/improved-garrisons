@@ -17,6 +17,15 @@
 
     <SubModules>
         <SubModule>
+            <Name value="Improved Garrisons Coop Bootstrap (Client)"/>
+            <DLLName value="ImprovedGarrisons.CoopBootstrap.dll"/>
+            <SubModuleClassType value="ImprovedGarrisons.CoopBootstrap.IntegrationSubModule"/>
+            <Tags>
+                <Tag key="DedicatedServerType" value="none" />
+                <Tag key="IsNoRenderModeElement" value="false" />
+            </Tags>
+        </SubModule>
+        <SubModule>
             <Name value="Improved Garrisons (Client)"/>
             <DLLName value="ImprovedGarrisons.dll"/>
             <SubModuleClassType value="ImprovedGarrisons.Main"/>
@@ -26,12 +35,12 @@
             </Tags>
         </SubModule>
         <SubModule>
-            <Name value="Improved Garrisons (Dedicated Server)"/>
-            <DLLName value="ImprovedGarrisons.dll"/>
-            <SubModuleClassType value="ImprovedGarrisons.Main"/>
+            <Name value="Improved Garrisons Coop Bootstrap (Dedicated Server)"/>
+            <DLLName value="ImprovedGarrisons.CoopBootstrap.dll"/>
+            <SubModuleClassType value="ImprovedGarrisons.CoopBootstrap.IntegrationSubModule"/>
             <Tags>
                 <Tag key="DedicatedServerType" value="custom" />
-                <Tag key="IsNoRenderModeElement" value="true" />
+                <Tag key="IsNoRenderModeElement" value="false" />
             </Tags>
         </SubModule>
     </SubModules>

@@ -1,0 +1,66 @@
+Improved Garrisons v1.0.0 - BannerlordCoop dedicated server
+===========================================================
+
+This package is one custom Bannerlord module. Do not install CoopModPatch or
+the abandoned reflection bridge.
+
+This BannerlordCoop appliance launches a fixed module set, ignores dropped-in
+module folders, and accepts only one primary DedicatedServer.Windows submodule.
+ServerInstall/DedicatedServer.Windows.SubModule.xml therefore registers the
+dependency-free Improved Garrisons bootstrap as that primary entry. The
+bootstrap instantiates the genuine DedicatedServer.Windows submodule and
+forwards only its four real overrides before running Improved Garrisons.
+
+Clean install
+-------------
+
+1. Stop the dedicated server and back up the current campaign save.
+2. Restore the stock DedicatedServer.Windows module from the server appliance.
+3. Remove any ImprovedGarrisons.CoopServerBridge.dll left in either
+   DedicatedServer.Windows bin directory.
+4. Remove the separate CoopModPatch module unless another installed mod
+   explicitly requires it. Improved Garrisons does not use it.
+5. Copy this complete folder to:
+
+     engine/Modules/ImprovedGarrisons
+
+6. Create this directory if the appliance does not contain it:
+
+     engine/Modules/DedicatedServer.Windows/bin/Win64_Shipping_Client
+
+7. Create links named ImprovedGarrisons.CoopBootstrap.dll in both
+   DedicatedServer.Windows bin directories. Each link must target the matching
+   DLL inside ImprovedGarrisons. Do not copy a separate build of the code.
+8. Back up DedicatedServer.Windows/SubModule.xml, then replace it with:
+
+     ImprovedGarrisons/ServerInstall/DedicatedServer.Windows.SubModule.xml
+
+   The bootstrap loads the stock DedicatedServer.Windows.dll, invokes its
+   OnSubModuleLoad first, and ticks it before Improved Garrisons every frame.
+   It forwards no invented DedicatedServer lifecycle methods.
+9. Make ImprovedGarrisons the only custom entry in modded-server-modules.txt.
+10. Start the server normally. The Pterodactyl console must show only:
+
+     [egg] active modded server modules:
+     ImprovedGarrisons
+
+   The module writes its last activation stage to
+   ModuleData/CoopRuntime.status. A healthy server reaches:
+
+     transport-connected:server
+
+The module never edits the server startup command, module list, policy file,
+or DedicatedServer.Windows files at runtime.
+
+Client install
+--------------
+
+Copy the same complete ImprovedGarrisons folder under the client's Bannerlord
+Modules directory. Client and server DLLs in this package are byte-identical.
+
+Acceptance check
+----------------
+
+After joining, confirm ordinary lords, caravans, and villagers continue moving
+before creating a test guard or recruiter. Then confirm the server logs one
+request and one acknowledgement for that action.
