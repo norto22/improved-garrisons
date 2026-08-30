@@ -36,7 +36,9 @@ Clean install
      ImprovedGarrisons/ServerInstall/DedicatedServer.Windows.SubModule.xml
 
    The bootstrap loads the stock DedicatedServer.Windows.dll, invokes its
-   OnSubModuleLoad first, and ticks it before Improved Garrisons every frame.
+   OnSubModuleLoad first, verifies BannerlordCoop's native MobileParty registry
+   and constructor prefix, and only then activates Improved Garrisons server
+   simulation. Deferred campaign lifecycle calls are replayed after readiness.
    It forwards no invented DedicatedServer lifecycle methods.
 9. Make ImprovedGarrisons the only custom entry in modded-server-modules.txt.
 10. Start the server normally. The Pterodactyl console must show only:
@@ -45,9 +47,19 @@ Clean install
      ImprovedGarrisons
 
    The module writes its last activation stage to
-   ModuleData/CoopRuntime.status. A healthy server reaches:
+   ModuleData/CoopRuntime.status. During bring-up a healthy server reaches:
+
+     native-mobile-party-registry-ready
+
+   and then, after the IG service binds to Coop networking:
 
      transport-connected:server
+
+   A native-mobile-party-registry-unavailable,
+   native-mobile-party-constructor-prefix-unavailable, or
+   native-mobile-party-postcondition-failed status is fail-closed: IG party
+   simulation remains blocked and activation retries. Preserve that status and
+   the matching server log before changing the installation.
 
 The module never edits the server startup command, module list, policy file,
 or DedicatedServer.Windows files at runtime.
@@ -62,5 +74,8 @@ Acceptance check
 ----------------
 
 After joining, confirm ordinary lords, caravans, and villagers continue moving
-before creating a test guard or recruiter. Then confirm the server logs one
-request and one acknowledgement for that action.
+before creating a test guard, recruiter, transfer, and village-recruit party.
+For each interactive action, confirm the server logs one received/completed
+intent and Coop logs one native MobileParty lifetime creation. There is no
+Improved Garrisons party-creation acknowledgement or replacement party payload;
+the created party appearing through Coop replication is the completion signal.
