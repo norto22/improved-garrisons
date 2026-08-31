@@ -1,0 +1,90 @@
+Improved Garrisons v1.0.6 - BannerlordCoop dedicated server
+=============================================================
+
+This package is one custom Bannerlord module.
+
+The BannerlordCoop appliance launches a fixed module set (Coop,
+DedicatedServer.Windows, Native, SandBox, SandBoxCore) and accepts only one
+primary DedicatedServer.Windows submodule. A module folder dropped next to
+those five is never loaded, no matter what modded-server-modules.txt says --
+that file is bookkeeping the egg's own startup script maintains for display
+purposes; nothing in the engine reads it to decide what to load.
+
+ServerInstall/DedicatedServer.Windows.SubModule.xml is the only mechanism that
+makes the appliance actually run Improved Garrisons code. It adds a second
+<SubModule> entry to DedicatedServer.Windows's manifest, alongside the stock
+one, declaring the Improved Garrisons Coop bootstrap
+(ImprovedGarrisons.CoopBootstrap.dll / ImprovedGarrisons.CoopBootstrap.
+IntegrationSubModule). The bootstrap loads the stock DedicatedServer.Windows
+submodule first, forwards its real lifecycle overrides, waits for
+BannerlordCoop's native MobileParty registry and constructor prefix to be
+ready, and only then activates Improved Garrisons server simulation.
+
+Install
+-------
+
+1. Stop the dedicated server and back up the current campaign save.
+2. Copy this complete folder to:
+
+     engine/Modules/ImprovedGarrisons
+
+3. The appliance's own startup script (an egg/Docker-level setting, not a
+   file in this package) is expected to symlink
+   ImprovedGarrisons.CoopBootstrap.dll into both
+   engine/Modules/DedicatedServer.Windows/bin/Win64_Shipping_Client/ and
+   .../Win64_Shipping_Server/ automatically on every boot. Confirm those
+   symlinks exist before continuing; if the appliance you're deploying to
+   doesn't create them, create them yourself, pointing at the DLL inside
+   this ImprovedGarrisons folder -- never a separate copy.
+4. Back up engine/Modules/DedicatedServer.Windows/SubModule.xml, then replace
+   it with the content of:
+
+     ImprovedGarrisons/ServerInstall/DedicatedServer.Windows.SubModule.xml
+
+5. Start the server.
+
+Verification (do this, not just reading the console banner)
+--------------------------------------------------------------
+
+The egg's "[egg] active modded server modules: ImprovedGarrisons" banner only
+proves the egg's own bookkeeping file was updated -- it does NOT prove the
+engine loaded the module. Confirm the real thing instead:
+
+  - engine/Modules/ImprovedGarrisons/ModuleData/CoopRuntime.status must exist
+    after the server finishes booting. Its absence means step 4 above was not
+    applied (or was reverted by an update -- see "Durability" below).
+  - The bootstrap logs "[ImprovedGarrisons] Coop bootstrap loaded; waiting for
+    BannerlordCoop networking." to the server's own console/stdout on boot.
+  - CoopRuntime.status should progress to native-mobile-party-registry-ready
+    and then transport-connected:server as a client joins.
+
+Durability -- reapply after updates
+--------------------------------------
+
+Step 4 patches a file owned by the BannerlordCoop appliance
+(DedicatedServer.Windows), not by this module. An appliance/Coop update that
+re-extracts that module's own files will silently discard the patch, and the
+server will boot with Improved Garrisons never running again -- with no error,
+just total silence from every Improved Garrisons action. There is currently no
+way to make this self-healing from inside this module or this repository (it
+would require editing the appliance's own startup script, which is outside
+this module's control and resets on update the same way). Re-run step 4 after
+every BannerlordCoop/appliance update, and check the Verification section
+above afterward.
+
+Client install
+--------------
+
+Copy the same complete ImprovedGarrisons folder under the client's Bannerlord
+Modules directory. Client and server DLLs in this package are byte-identical.
+Replace both sides together whenever updating: BannerlordCoop excludes
+Official modules from its version comparison, so it cannot detect an older
+Improved Garrisons client by itself.
+
+Improved Garrisons uses BannerlordCoop's own dedicated-server connection state
+as the only campaign-readiness authority -- there is no separate Improved
+Garrisons handshake, socket, listener, or server process. The dedicated server
+accepts intents and answers configuration/state/manifest/health requests only
+after Coop's own IConnectionCollection reports that peer has completed
+campaign synchronization. All Improved Garrisons traffic travels through
+Coop's INetwork and IMessageBroker.

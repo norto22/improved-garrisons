@@ -33,6 +33,7 @@ public static class ContractRunner
             GameThread.Instance.MarkGameThread();
             TestClientSendsConfigRequestThroughCoopNetwork();
             ResetIntegrationTransport();
+            TestClientFallsBackToLocalExecutionWhenCoopInactive();
             TestServerSubscribesAndRepliesThroughCoopNetwork();
             Console.WriteLine($"PASS {TestName}");
             return 0;
@@ -79,6 +80,23 @@ public static class ContractRunner
             "The shipped client runtime did not send ConfigRequest through BannerlordCoop INetwork.");
         Assert(mapper.TryGetId(typeof(ConfigRequest), out _),
             "The shipped client runtime did not register ConfigRequest with Coop's real serializer mapper.");
+    }
+
+    private static void TestClientFallsBackToLocalExecutionWhenCoopInactive()
+    {
+        ModInformation.IsServer = false;
+
+        Type patches = typeof(ConfigRequest).Assembly.GetType(
+            "ImprovedGarrisons.CoopIntegration.Patching.ClientServerPatches",
+            throwOnError: true)!;
+        MethodInfo isClient = patches.GetMethod("IsClient", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingMethodException(patches.FullName, "IsClient");
+
+        bool shouldForwardToServer = (bool)isClient.Invoke(null, null)!;
+
+        Assert(!shouldForwardToServer,
+            "The shipped client runtime intercepted an action and tried to forward it to the server even though " +
+            "Coop is not connected; it should have run the action locally instead.");
     }
 
     private static void TestServerSubscribesAndRepliesThroughCoopNetwork()
