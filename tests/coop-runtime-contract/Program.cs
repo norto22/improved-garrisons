@@ -35,6 +35,8 @@ public static class ContractRunner
             ResetIntegrationTransport();
             TestClientFallsBackToLocalExecutionWhenCoopInactive();
             TestServerSubscribesAndRepliesThroughCoopNetwork();
+            ResetIntegrationTransport();
+            TestSettingSliderDragCoalescesToOneSend();
             Console.WriteLine($"PASS {TestName}");
             return 0;
         }
@@ -97,6 +99,52 @@ public static class ContractRunner
         Assert(!shouldForwardToServer,
             "The shipped client runtime intercepted an action and tried to forward it to the server even though " +
             "Coop is not connected; it should have run the action locally instead.");
+    }
+
+    private static void TestSettingSliderDragCoalescesToOneSend()
+    {
+        ModInformation.IsServer = false;
+        MessageBroker broker = new();
+        RecordingNetwork network = new();
+        SerializableTypeMapper mapper = new();
+        FakeClientLogic logic = new();
+        CampaignState campaignState = new(
+            logic,
+            broker,
+            network,
+            CreateDefaultProxy<ILoadingInterface>(),
+            CreateDefaultProxy<IGameStateInterface>(),
+            CreateDefaultProxy<ICoopFinalizer>(),
+            CreateDefaultProxy<IMapTimeTrackerInterface>());
+        logic.State = campaignState;
+
+        using IContainer container = BuildContainer(builder =>
+        {
+            builder.RegisterInstance(logic).As<IClientLogic>();
+            RegisterCommon(builder, broker, network, mapper);
+        });
+        ContainerProvider.SetContainer(container);
+
+        InvokeTransport("Poll");
+
+        Type patches = typeof(ConfigRequest).Assembly.GetType(
+            "ImprovedGarrisons.CoopIntegration.Patching.ClientServerPatches",
+            throwOnError: true)!;
+        MethodInfo sendThrottled = patches.GetMethod("SendSettingThrottled", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingMethodException(patches.FullName, "SendSettingThrottled");
+
+        // Simulates dragging a slider from 0 to 19 with no real time elapsing between ticks -- exactly
+        // what a fast mouse drag looks like to Environment.TickCount within one throttle window.
+        for (int value = 0; value < 20; value++)
+        {
+            SettingsIntent intent = new() { SettlementId = "contract-test-town", IntegerArgument = value };
+            sendThrottled.Invoke(null, new object?[] { SettingsIntentKind.SetRecruiterAmountToRecruit, intent });
+        }
+
+        int sentSettingsIntents = network.SentAll.Count(message => message is SettingsIntent);
+        Assert(sentSettingsIntents >= 1 && sentSettingsIntents <= 2,
+            $"20 rapid setting changes within one throttle window produced {sentSettingsIntents} network sends " +
+            "(expected 1, occasionally 2 on a timing edge); the throttle is not coalescing a fast slider drag.");
     }
 
     private static void TestServerSubscribesAndRepliesThroughCoopNetwork()
