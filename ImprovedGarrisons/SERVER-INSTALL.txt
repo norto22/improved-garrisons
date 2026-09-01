@@ -72,6 +72,23 @@ this module's control and resets on update the same way). Re-run step 4 after
 every BannerlordCoop/appliance update, and check the Verification section
 above afterward.
 
+Persistent Coop data
+--------------------
+
+On the dedicated server, Improved Garrisons stores its Coop settlement
+settings and generated-party identity manifest under:
+
+  <BannerlordCoop data dir>/ImprovedGarrisons
+
+The server obtains the exact data directory from BannerlordCoop's
+BANNERLORD_USER_DIR environment variable, so a custom --data-dir is honored.
+This location sits beside the Coop Game Saves folder and survives replacement
+of the DedicatedServer install tree. On the first fixed-version boot, the four
+known IG state/backup files are copied from the legacy
+DedicatedServer/server-data/improved-garrisons folder when no persistent copy
+already exists. No Coop save or player-registration JSON file is migrated or
+modified.
+
 Client install
 --------------
 
