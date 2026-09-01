@@ -54,6 +54,7 @@ recruitment_vm="$decompile_dir/main/ImprovedGarrisons.ImprovedGarrisonsUI.SubMen
 guards_vm="$decompile_dir/main/ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus/GuardsUIVM.cs"
 gauntlet="$decompile_dir/main/ImprovedGarrisons.ImprovedGarrisonsUI/ImprovedGarrisonsUIGauntlet.cs"
 root_vm="$decompile_dir/main/ImprovedGarrisons.ImprovedGarrisonsUI/ImprovedGarrisonsUIVM.cs"
+ui_manager="$decompile_dir/main/ImprovedGarrisons.ImprovedGarrisonsUI/UIManager.cs"
 
 failures=0
 record_failure() {
@@ -62,8 +63,8 @@ record_failure() {
 }
 
 apply_state="$(rtk sed -n '/public static void ApplyState(/,/public static void MarkDirty()/p' "$state_store")"
-if ! print -r -- "$apply_state" | rtk rg -q 'ForceFullRefresh'; then
-	record_failure "H1: authoritative settings sync does not request a full active-view refresh."
+if ! print -r -- "$apply_state" | rtk rg -q 'ForceFullRefresh|RefreshCurrentUiTab'; then
+	record_failure "H1: authoritative settings sync does not request an active-view value refresh."
 fi
 
 option_refresh="$(rtk sed -n '/public override void RefreshValues()/,/public void OnPress()/p' "$option_vm")"
@@ -136,3 +137,50 @@ if (( failures > 0 )); then
 fi
 
 print "PASS test_authoritative_ui_updates_stale_views_without_local_divergence"
+
+slider_failures=0
+record_slider_failure() {
+	print -u2 -- "FAIL $1"
+	(( slider_failures += 1 ))
+}
+
+module_dir="${subject_dll:h:h:h}"
+slider_prefabs=(
+	"$module_dir/GUI/Prefabs/UIElements/ImprovedGarrisonsBottomListPanel.xml"
+	"$module_dir/GUI/Prefabs/ImprovedGarrisonsCategory.xml"
+	"$module_dir/GUI/Prefabs/UITabs/ImprovedGarrisonsTrainingMenu.xml"
+)
+
+for slider_prefab in "${slider_prefabs[@]}"; do
+	if [[ ! -f "$slider_prefab" ]]; then
+		record_slider_failure "slider prefab is missing from the deployed module: $slider_prefab"
+		continue
+	fi
+
+	slider_tags="$(rtk rg '<SliderWidget ' "$slider_prefab")"
+	if [[ -z "$slider_tags" ]]; then
+		record_slider_failure "slider prefab contains no SliderWidget: $slider_prefab"
+	elif print -r -- "$slider_tags" | rtk rg -v -q 'UpdateValueOnRelease="true"'; then
+		record_slider_failure "slider commits while pressed instead of deferring writeback until release: $slider_prefab"
+	fi
+done
+
+if ! print -r -- "$apply_state" | rtk rg -q 'RefreshCurrentUiTab'; then
+	record_slider_failure "authoritative state sync does not request a non-destructive current-tab refresh."
+fi
+if print -r -- "$apply_state" | rtk rg -q 'ForceFullRefresh'; then
+	record_slider_failure "authoritative state sync can replace the active slider widget during a drag."
+fi
+
+current_tab_refresh_api="$(rtk sed -n '/public void RefreshCurrentUiTab()/,/public void ForceFullRefresh()/p' "$ui_manager")"
+if ! print -r -- "$current_tab_refresh_api" | rtk rg -q 'UpdateCurrentUiTab' ||
+   print -r -- "$current_tab_refresh_api" | rtk rg -q 'ForceFullRefresh\(\);'; then
+	record_slider_failure "the Coop-safe refresh API does not preserve the existing active datasource."
+fi
+
+if (( slider_failures > 0 )); then
+	print -u2 -- "FAIL test_slider_drag_defers_commit_and_preserves_active_widget ($slider_failures contract failures)"
+	exit 1
+fi
+
+print "PASS test_slider_drag_defers_commit_and_preserves_active_widget"

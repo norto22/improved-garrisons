@@ -67,7 +67,7 @@
                                                   
                                                     <RichTextWidget WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren" SuggestedWidth="*SliderFrameSize" MarginLeft="0" Brush="SPOptions.OptionName.Text" HorizontalAlignment="Center" VerticalAlignment="Center" Text="@Description" Brush.FontSize="*FontSize" DoNotAcceptEvents="true" Brush.TextHorizontalAlignment="Center" />
                                                     
-                                                    <SliderWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="*SliderFrameSize" SuggestedHeight="42" VerticalAlignment="Center" HorizontalAlignment="Center" DoNotUpdateHandleSize="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="@IsDiscrete" MaxValueFloat="@Max" MinValueFloat="@Min" ValueFloat="@OptionValueAsFloat">
+                                                    <SliderWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="*SliderFrameSize" SuggestedHeight="42" VerticalAlignment="Center" HorizontalAlignment="Center" DoNotUpdateHandleSize="true" UpdateValueOnRelease="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="@IsDiscrete" MaxValueFloat="@Max" MinValueFloat="@Min" ValueFloat="@OptionValueAsFloat">
                                                       <Children>
                                                       
                                                         <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="*SliderFrameSize" SuggestedHeight="38" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="SPGeneral\SPOptions\standart_slider_canvas" IsEnabled="false" />
