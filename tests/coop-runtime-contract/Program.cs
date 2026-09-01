@@ -37,6 +37,7 @@ public static class ContractRunner
             TestServerSubscribesAndRepliesThroughCoopNetwork();
             ResetIntegrationTransport();
             TestSettingSliderDragCoalescesToOneSend();
+            test_apply_setting_slider_updates_return_silent_success();
             Console.WriteLine($"PASS {TestName}");
             return 0;
         }
@@ -145,6 +146,62 @@ public static class ContractRunner
         Assert(sentSettingsIntents >= 1 && sentSettingsIntents <= 2,
             $"20 rapid setting changes within one throttle window produced {sentSettingsIntents} network sends " +
             "(expected 1, occasionally 2 on a timing edge); the throttle is not coalescing a fast slider drag.");
+    }
+
+    private static void test_apply_setting_slider_updates_return_silent_success()
+    {
+        Type integrationAssemblyMarker = typeof(ConfigRequest);
+        Type dispatcher = integrationAssemblyMarker.Assembly.GetType(
+            "ImprovedGarrisons.CoopIntegration.Runtime.ServerActionDispatcher",
+            throwOnError: true)!;
+        Type actionType = integrationAssemblyMarker.Assembly.GetType(
+            "ImprovedGarrisons.CoopIntegration.Runtime.ServerAction",
+            throwOnError: true)!;
+        MethodInfo applySetting = dispatcher.GetMethod("ApplySetting", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingMethodException(dispatcher.FullName, "ApplySetting");
+        PropertyInfo settingOperation = actionType.GetProperty("SettingOperation")
+            ?? throw new MissingMemberException(actionType.FullName, "SettingOperation");
+
+        SettingsIntentKind[] sliderOperations =
+        {
+            SettingsIntentKind.SetReturnPercentage,
+            SettingsIntentKind.SetAutoGarrisonThreshold,
+            SettingsIntentKind.SetAutoGarrisonSize,
+            SettingsIntentKind.SetRecruiterAmountToRecruit,
+            SettingsIntentKind.SetRecruitmentThreshold,
+            SettingsIntentKind.SetTownMaxUpgradeTier
+        };
+
+        foreach (SettingsIntentKind operation in sliderOperations)
+        {
+            object action = Activator.CreateInstance(actionType, nonPublic: true)
+                ?? throw new InvalidOperationException($"Could not construct {actionType.FullName}.");
+            settingOperation.SetValue(action, (int)operation);
+
+            object outcome;
+            try
+            {
+                outcome = applySetting.Invoke(null, new object?[] { action, null })
+                    ?? throw new InvalidOperationException($"ApplySetting returned null for {operation}.");
+            }
+            catch (TargetInvocationException exception) when (exception.InnerException != null)
+            {
+                throw exception.InnerException;
+            }
+
+            Type outcomeType = outcome.GetType();
+            bool success = (bool)(outcomeType.GetProperty("Success")?.GetValue(outcome)
+                ?? throw new MissingMemberException(outcomeType.FullName, "Success"));
+            string code = (string)(outcomeType.GetProperty("Code")?.GetValue(outcome)
+                ?? throw new MissingMemberException(outcomeType.FullName, "Code"));
+            string text = (string)(outcomeType.GetProperty("Text")?.GetValue(outcome)
+                ?? throw new MissingMemberException(outcomeType.FullName, "Text"));
+
+            Assert(success, $"{operation} did not retain a successful setting outcome.");
+            Assert(code == "updated", $"{operation} returned outcome code '{code}' instead of 'updated'.");
+            Assert(string.IsNullOrEmpty(text),
+                $"{operation} returned success chat text '{text}'; routine slider updates must be silent.");
+        }
     }
 
     private static void TestServerSubscribesAndRepliesThroughCoopNetwork()
