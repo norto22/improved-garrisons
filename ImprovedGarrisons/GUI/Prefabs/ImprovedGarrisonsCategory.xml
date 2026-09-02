@@ -58,7 +58,7 @@
                                 <ListPanel Id="NumericOption" WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Left" VerticalAlignment="Center" MarginLeft="20" IsVisible="false">
                                   <Children>
 
-                                    <SliderWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="338" SuggestedHeight="42" VerticalAlignment="Center" DoNotUpdateHandleSize="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="@IsDiscrete" MaxValueFloat="@Max" MinValueFloat="@Min" ValueFloat="@OptionValue">
+                                    <SliderWidget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="338" SuggestedHeight="42" VerticalAlignment="Center" DoNotUpdateHandleSize="true" UpdateValueOnRelease="true" Filler="Filler" Handle="SliderHandle" IsDiscrete="@IsDiscrete" MaxValueFloat="@Max" MinValueFloat="@Min" ValueFloat="@OptionValue">
                                       <Children>
                                         <Widget WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="362" SuggestedHeight="38" HorizontalAlignment="Center" VerticalAlignment="Center" Sprite="SPGeneral\SPOptions\standart_slider_canvas" IsEnabled="false" />
                                         <Widget Id="Filler" WidthSizePolicy="Fixed" HeightSizePolicy="Fixed" SuggestedWidth="345" SuggestedHeight="35" VerticalAlignment="Center" Sprite="SPGeneral\SPOptions\standart_slider_fill" ClipContents="true">

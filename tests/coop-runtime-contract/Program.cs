@@ -31,6 +31,9 @@ public static class ContractRunner
         try
         {
             GameThread.Instance.MarkGameThread();
+            TestPersistentDataUsesCoopDataDirectory();
+            TestLegacyPersistenceMigrationIsScopedAndNonDestructive();
+            TestBannerlordUserDirMigratesFromDocumentsPersistence();
             TestClientSendsConfigRequestThroughCoopNetwork();
             ResetIntegrationTransport();
             TestClientFallsBackToLocalExecutionWhenCoopInactive();
@@ -50,6 +53,132 @@ public static class ContractRunner
         {
             ContainerProvider.Clear();
             GameThread.Instance.UnmarkGameThread();
+        }
+    }
+
+    private static void TestPersistentDataUsesCoopDataDirectory()
+    {
+        Type paths = GetIntegrationDataPathsType();
+        FieldInfo directory = paths.GetField("_directory", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingFieldException(paths.FullName, "_directory");
+        MethodInfo filePath = paths.GetMethod("FilePath", BindingFlags.Public | BindingFlags.Static)
+            ?? throw new MissingMethodException(paths.FullName, "FilePath");
+        string root = Path.Combine(Path.GetTempPath(), "ig-coop-data-contract-" + Guid.NewGuid().ToString("N"));
+        string? previous = Environment.GetEnvironmentVariable("BANNERLORD_USER_DIR");
+
+        Directory.CreateDirectory(root);
+        try
+        {
+            Environment.SetEnvironmentVariable("BANNERLORD_USER_DIR", root);
+            directory.SetValue(null, null);
+
+            string actual = (string)(filePath.Invoke(null, new object[] { "contract-state.txt" })
+                ?? throw new InvalidOperationException("IntegrationDataPaths.FilePath returned null."));
+            string expected = Path.Combine(root, "ImprovedGarrisons", "contract-state.txt");
+
+            Assert(string.Equals(Path.GetFullPath(actual), Path.GetFullPath(expected), StringComparison.Ordinal),
+                $"The shipped integration resolved persistent data to '{actual}' instead of Coop's data directory '{expected}'.");
+        }
+        finally
+        {
+            directory.SetValue(null, null);
+            Environment.SetEnvironmentVariable("BANNERLORD_USER_DIR", previous);
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    private static void TestLegacyPersistenceMigrationIsScopedAndNonDestructive()
+    {
+        Type paths = GetIntegrationDataPathsType();
+        MethodInfo migrate = paths.GetMethod("MigrateLegacyData", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingMethodException(paths.FullName, "MigrateLegacyData");
+        string root = Path.Combine(Path.GetTempPath(), "ig-persistence-migration-contract-" + Guid.NewGuid().ToString("N"));
+        string legacy = Path.Combine(root, "server-data", "improved-garrisons");
+        string persistent = Path.Combine(root, "CoopData", "DedicatedServer", "ImprovedGarrisons");
+
+        Directory.CreateDirectory(legacy);
+        Directory.CreateDirectory(persistent);
+        try
+        {
+            File.WriteAllText(Path.Combine(legacy, "settlement-settings.txt"), "legacy-settings");
+            File.WriteAllText(Path.Combine(legacy, "party-manifest.txt"), "legacy-manifest");
+            File.WriteAllText(Path.Combine(legacy, "party-manifest.txt.bak"), "legacy-backup");
+            File.WriteAllText(Path.Combine(legacy, "player-assignments.json"), "must-not-migrate");
+            File.WriteAllText(Path.Combine(persistent, "party-manifest.txt"), "persistent-manifest");
+
+            migrate.Invoke(null, new object[] { legacy, persistent });
+
+            Assert(File.ReadAllText(Path.Combine(persistent, "settlement-settings.txt")) == "legacy-settings",
+                "The shipped integration did not migrate legacy settlement settings.");
+            Assert(File.ReadAllText(Path.Combine(persistent, "party-manifest.txt")) == "persistent-manifest",
+                "Legacy migration overwrote an existing persistent party manifest.");
+            Assert(File.ReadAllText(Path.Combine(persistent, "party-manifest.txt.bak")) == "legacy-backup",
+                "The shipped integration did not migrate the legacy party-manifest backup.");
+            Assert(!File.Exists(Path.Combine(persistent, "player-assignments.json")),
+                "Legacy migration copied a file outside Improved Garrisons' explicit persistence allowlist.");
+        }
+        finally
+        {
+            Directory.Delete(root, recursive: true);
+        }
+    }
+
+    private static void TestBannerlordUserDirMigratesFromDocumentsPersistence()
+    {
+        Type paths = GetIntegrationDataPathsType();
+        FieldInfo directory = paths.GetField("_directory", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingFieldException(paths.FullName, "_directory");
+        MethodInfo filePath = paths.GetMethod("FilePath", BindingFlags.Public | BindingFlags.Static)
+            ?? throw new MissingMethodException(paths.FullName, "FilePath");
+        MethodInfo resolveDocumentsUserDirectory = paths.GetMethod("ResolveDocumentsUserDirectory", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingMethodException(paths.FullName, "ResolveDocumentsUserDirectory");
+
+        string? documentsRoot;
+        try
+        {
+            documentsRoot = (string?)resolveDocumentsUserDirectory.Invoke(null, null);
+        }
+        catch (TargetInvocationException)
+        {
+            documentsRoot = null;
+        }
+
+        if (string.IsNullOrEmpty(documentsRoot))
+        {
+            Console.WriteLine("SKIP TestBannerlordUserDirMigratesFromDocumentsPersistence: no Documents directory resolvable in this environment.");
+            return;
+        }
+
+        string documentsPersistent = Path.Combine(documentsRoot, "ImprovedGarrisons");
+        bool createdDocumentsPersistent = !Directory.Exists(documentsPersistent);
+        string bannerlordUserDirRoot = Path.Combine(Path.GetTempPath(), "ig-bannerlord-user-dir-contract-" + Guid.NewGuid().ToString("N"));
+        string? previous = Environment.GetEnvironmentVariable("BANNERLORD_USER_DIR");
+
+        Directory.CreateDirectory(documentsPersistent);
+        Directory.CreateDirectory(bannerlordUserDirRoot);
+        try
+        {
+            File.WriteAllText(Path.Combine(documentsPersistent, "settlement-settings.txt"), "documents-legacy-settings");
+
+            Environment.SetEnvironmentVariable("BANNERLORD_USER_DIR", bannerlordUserDirRoot);
+            directory.SetValue(null, null);
+
+            filePath.Invoke(null, new object[] { "contract-state.txt" });
+
+            string migrated = Path.Combine(bannerlordUserDirRoot, "ImprovedGarrisons", "settlement-settings.txt");
+            Assert(File.Exists(migrated) && File.ReadAllText(migrated) == "documents-legacy-settings",
+                "Setting BANNERLORD_USER_DIR did not migrate settlement settings previously persisted under the Documents-based directory.");
+        }
+        finally
+        {
+            directory.SetValue(null, null);
+            Environment.SetEnvironmentVariable("BANNERLORD_USER_DIR", previous);
+            Directory.Delete(bannerlordUserDirRoot, recursive: true);
+            File.Delete(Path.Combine(documentsPersistent, "settlement-settings.txt"));
+            if (createdDocumentsPersistent)
+            {
+                Directory.Delete(documentsPersistent, recursive: true);
+            }
         }
     }
 
@@ -281,6 +410,13 @@ public static class ContractRunner
     {
         return typeof(ConfigRequest).Assembly.GetType(
             "ImprovedGarrisons.CoopIntegration.Runtime.IntegrationTransport",
+            throwOnError: true)!;
+    }
+
+    private static Type GetIntegrationDataPathsType()
+    {
+        return typeof(ConfigRequest).Assembly.GetType(
+            "ImprovedGarrisons.CoopIntegration.Persistence.IntegrationDataPaths",
             throwOnError: true)!;
     }
 
