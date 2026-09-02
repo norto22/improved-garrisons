@@ -73,21 +73,36 @@ jobs:
           RELEASE_ARCHIVE: ${{ steps.package.outputs.release_archive }}
           RELEASE_TAG: ${{ steps.package.outputs.release_tag }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         shell: bash
         run: |
           set -euo pipefail
           release_title="Improved Garrisons ${MODULE_VERSION} (PR #${PR_NUMBER})"
 
+          # Use the merged PR's own description as the release notes when it has one.
+          # `gh release create` can fall back to auto-generated notes for an
+          # empty/title-only PR, but `gh release edit` has no --generate-notes flag,
+          # so an empty body there just leaves the existing notes untouched.
+          notes_file="$(mktemp)"
+          printf '%s' "$PR_BODY" > "$notes_file"
+          if [[ -s "$notes_file" ]]; then
+            create_notes_args=(--notes-file "$notes_file")
+            edit_notes_args=(--notes-file "$notes_file")
+          else
+            create_notes_args=(--generate-notes)
+            edit_notes_args=()
+          fi
+
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" "${RELEASE_ARCHIVE}#Client and dedicated-server module" --clobber
-            gh release edit "$RELEASE_TAG" --title "$release_title" --latest
+            gh release edit "$RELEASE_TAG" --title "$release_title" --latest "${edit_notes_args[@]}"
           else
             gh release create "$RELEASE_TAG" \
               "${RELEASE_ARCHIVE}#Client and dedicated-server module" \
               --target "$MERGE_SHA" \
               --title "$release_title" \
-              --generate-notes \
-              --latest
+              --latest \
+              "${create_notes_args[@]}"
           fi
 
   stage-module:
@@ -181,10 +196,25 @@ jobs:
       - name: Build and upload Workshop item
         env:
           STEAM_WORKSHOP_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
-          CHANGENOTE: "Improved Garrisons ${{ needs.release.outputs.release_tag }} - changelog: https://github.com/${{ github.repository }}/releases/tag/${{ needs.release.outputs.release_tag }}"
+          RELEASE_TAG: ${{ needs.release.outputs.release_tag }}
+          RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.release.outputs.release_tag }}
+          PR_BODY: ${{ github.event.pull_request.body }}
           CONTENT_FOLDER: ${{ github.workspace }}/artifact/Modules/ImprovedGarrisons
         run: |
           set -euo pipefail
+          # Lead with the merged PR's own description, same text as the GitHub release
+          # notes, then a link back to the full release page.
+          changenote="Improved Garrisons ${RELEASE_TAG}"
+          if [[ -n "$PR_BODY" ]]; then
+            changenote="${changenote}"$'\n\n'"${PR_BODY}"
+          fi
+          changenote="${changenote}"$'\n\n'"Full changelog: ${RELEASE_URL}"
+
+          # VDF (KeyValues) quoted strings use backslash escaping; escape backslashes
+          # before quotes so a literal backslash in the PR body isn't double-escaped.
+          escaped_changenote="${changenote//\\/\\\\}"
+          escaped_changenote="${escaped_changenote//\"/\\\"}"
+
           vdf="$(mktemp --suffix=.vdf)"
           {
             printf '"workshopitem"\n'
@@ -192,7 +222,7 @@ jobs:
             printf '\t"appid"\t\t\t"261550"\n'
             printf '\t"publishedfileid"\t"3793463493"\n'
             printf '\t"contentfolder"\t\t"%s"\n' "$CONTENT_FOLDER"
-            printf '\t"changenote"\t\t"%s"\n' "$CHANGENOTE"
+            printf '\t"changenote"\t\t"%s"\n' "$escaped_changenote"
             printf '}\n'
           } > "$vdf"
           steamcmd +login "$STEAM_WORKSHOP_LOGIN" +workshop_build_item "$vdf" +quit
