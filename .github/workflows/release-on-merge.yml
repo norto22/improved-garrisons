@@ -7,9 +7,6 @@ on:
     types:
       - closed
 
-permissions:
-  contents: write
-
 concurrency:
   group: release-live
   cancel-in-progress: false
@@ -19,6 +16,10 @@ jobs:
     name: Package and publish release
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      release_tag: ${{ steps.package.outputs.release_tag }}
 
     steps:
       - name: Check out merged commit
@@ -31,11 +32,22 @@ jobs:
         id: package
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
         shell: bash
         run: |
           set -euo pipefail
           module_version="$(sed -n 's/.*<Version value="\(v[^"]*\)".*/\1/p' ImprovedGarrisons/SubModule.xml | head -n 1)"
-          release_tag="${module_version}-pr${PR_NUMBER}"
+          release_tag="$(printf '%s' "$PR_TITLE" | xargs)"
+
+          if [[ ! "$release_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            printf 'PR title "%s" is not a version tag (expected vX.Y.Z, e.g. v1.1.0) - rename the PR and re-merge.\n' "$PR_TITLE" >&2
+            exit 1
+          fi
+          if [[ "$release_tag" != "$module_version" ]]; then
+            printf 'PR title "%s" does not match ImprovedGarrisons/SubModule.xml (%s) - bump SubModule.xml to match before merging.\n' "$release_tag" "$module_version" >&2
+            exit 1
+          fi
+
           release_archive="$(bash scripts/package-release.sh dist "$release_tag")"
 
           {
@@ -43,6 +55,15 @@ jobs:
             echo "release_tag=$release_tag"
             echo "release_archive=$release_archive"
           } >> "$GITHUB_OUTPUT"
+
+      # Uploaded so stage-module ships the exact bytes that became the GitHub
+      # release asset - not a second, separately-built copy that could drift
+      # from the allowlist/DLL-parity checks package-release.sh just ran.
+      - name: Upload release archive artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: improved-garrisons-release-archive
+          path: ${{ steps.package.outputs.release_archive }}
 
       - name: Publish GitHub release
         env:
@@ -68,3 +89,110 @@ jobs:
               --generate-notes \
               --latest
           fi
+
+  stage-module:
+    name: Stage module for Steam Workshop
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Download release archive artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: improved-garrisons-release-archive
+          path: archive
+
+      # publish-on-steam's contentfolder expects Modules/ImprovedGarrisons/..., matching
+      # Bannerlord's own module folder convention. Unzips the same archive that was
+      # uploaded as the GitHub release asset, so Steam and GitHub always ship identical
+      # contents - never a separately-assembled copy that could drift from the allowlist.
+      - name: Stage into Modules/ImprovedGarrisons
+        env:
+          RELEASE_ARCHIVE_NAME: ImprovedGarrisons-${{ needs.release.outputs.release_tag }}.zip
+        run: |
+          set -euo pipefail
+          mkdir -p staging/Modules
+          unzip -q "archive/${RELEASE_ARCHIVE_NAME}" -d staging/Modules
+
+      - name: Upload module artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: improved-garrisons-module
+          path: staging/
+
+  # Updates the existing Steam Workshop item (3793463493) directly via steamcmd's
+  # `workshop_build_item` - the same underlying call BUTR/Bannerlord.SteamWorkshop wraps
+  # (confirmed by reading its source: github.com/BUTR/Bannerlord.SteamWorkshop) - but
+  # authenticated with a persisted steamcmd login session instead of a Steam Guard Mobile
+  # Authenticator shared_secret, so the publishing account's mobile Steam Guard is never
+  # touched or extracted from.
+  #
+  # Requires two repo secrets set up once by hand (Settings > Secrets and variables >
+  # Actions):
+  #   STEAM_WORKSHOP_LOGIN      - the Steam account that owns the Workshop item
+  #   STEAM_WORKSHOP_CONFIG_VDF - a base64-encoded steamcmd config.vdf. Generate it with a
+  #     ONE-TIME normal login on your own machine (nothing to extract, no 2FA change):
+  #       1. Install steamcmd: https://developer.valvesoftware.com/wiki/SteamCMD
+  #       2. Run: steamcmd +login <that account's username> +quit
+  #          Enter the password, then the 5-character code from the Steam mobile app when
+  #          prompted - exactly like any other login.
+  #       3. Run the exact same command again. It should NOT ask for the code a second
+  #          time - that confirms the session is now persisted (this is what proves it
+  #          worked, so don't skip this check).
+  #       4. Base64-encode the resulting file and paste the output into the secret:
+  #          Linux/macOS: cat ~/Steam/config/config.vdf | base64 -w0
+  #          Windows:     certutil -encode config\config.vdf tmp.b64 && findstr /v /c:- tmp.b64
+  #   If a run ever starts asking for the code again, redo steps 2-4 and replace the
+  #   secret. Until both secrets exist, this job fails without affecting the GitHub
+  #   release above, which already completed in the `release` job.
+  #
+  # NOTE: steamcmd stores config/config.vdf relative to its OWN install directory, not
+  # $HOME/Steam - that path only exists because the secret-generation steps above happen
+  # to install steamcmd there by hand. CyberAndrii/setup-steamcmd installs into the
+  # runner's tool-cache instead, so the restore step below must target
+  # steps.steamcmd.outputs.directory, not $HOME/Steam.
+  publish-on-steam:
+    name: Publish on Steam Workshop
+    needs: [release, stage-module]
+    runs-on: ubuntu-latest
+    permissions: {}
+    timeout-minutes: 15
+    steps:
+      - name: Setup steamcmd
+        id: steamcmd
+        uses: CyberAndrii/setup-steamcmd@v1
+
+      - name: Download module artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: improved-garrisons-module
+          path: artifact
+
+      - name: Restore persisted Steam login session
+        env:
+          CONFIG_VDF_B64: ${{ secrets.STEAM_WORKSHOP_CONFIG_VDF }}
+          STEAMCMD_DIR: ${{ steps.steamcmd.outputs.directory }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$STEAMCMD_DIR/config"
+          printf '%s' "$CONFIG_VDF_B64" | base64 -d > "$STEAMCMD_DIR/config/config.vdf"
+
+      - name: Build and upload Workshop item
+        env:
+          STEAM_WORKSHOP_LOGIN: ${{ secrets.STEAM_WORKSHOP_LOGIN }}
+          CHANGENOTE: "Improved Garrisons ${{ needs.release.outputs.release_tag }} - changelog: https://github.com/${{ github.repository }}/releases/tag/${{ needs.release.outputs.release_tag }}"
+          CONTENT_FOLDER: ${{ github.workspace }}/artifact/Modules/ImprovedGarrisons
+        run: |
+          set -euo pipefail
+          vdf="$(mktemp --suffix=.vdf)"
+          {
+            printf '"workshopitem"\n'
+            printf '{\n'
+            printf '\t"appid"\t\t\t"261550"\n'
+            printf '\t"publishedfileid"\t"3793463493"\n'
+            printf '\t"contentfolder"\t\t"%s"\n' "$CONTENT_FOLDER"
+            printf '\t"changenote"\t\t"%s"\n' "$CHANGENOTE"
+            printf '}\n'
+          } > "$vdf"
+          steamcmd +login "$STEAM_WORKSHOP_LOGIN" +workshop_build_item "$vdf" +quit

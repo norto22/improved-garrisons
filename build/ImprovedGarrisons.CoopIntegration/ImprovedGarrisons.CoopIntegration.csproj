@@ -1,0 +1,95 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ImprovedGarrisons.CoopIntegration</AssemblyName>
+    <RootNamespace>ImprovedGarrisons.CoopIntegration</RootNamespace>
+    <Version>1.1.0</Version>
+    <AssemblyVersion>1.1.0.0</AssemblyVersion>
+    <FileVersion>1.1.0.0</FileVersion>
+    <InformationalVersion>1.1.0</InformationalVersion>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <PlatformTarget>x64</PlatformTarget>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ImprovedGarrisons/ImprovedGarrisons.csproj">
+      <Private>false</Private>
+    </ProjectReference>
+    <Reference Include="Common">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="GameInterface">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/GameInterface.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Coop.Core">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Coop.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Autofac">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Autofac.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="0Harmony">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/0Harmony.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="protobuf-net.Core">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/protobuf-net.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="LiteNetLib">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/LiteNetLib.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Serilog">
+      <HintPath>../../VanillaModuleFiles/BannerlordCoop/bin/Win64_Shipping_Client/Serilog.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.MountAndBlade">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.MountAndBlade.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Core">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.CampaignSystem">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.CampaignSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Library">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.Library.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Engine">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.Engine.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.Localization">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.Localization.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="TaleWorlds.ObjectSystem">
+      <HintPath>../../VanillaSourceFiles/Win64_Shipping_Client/TaleWorlds.ObjectSystem.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CopyModuleArtifacts" AfterTargets="Build">
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFiles="$(MSBuildThisFileDirectory)../../ImprovedGarrisons/bin/Win64_Shipping_Client/Adapters/$(TargetFileName)" />
+    <Copy SourceFiles="$(TargetPath)"
+          DestinationFiles="$(MSBuildThisFileDirectory)../../ImprovedGarrisons/bin/Win64_Shipping_Server/Adapters/$(TargetFileName)" />
+  </Target>
+</Project>

@@ -33,6 +33,7 @@ public static class ContractRunner
             GameThread.Instance.MarkGameThread();
             TestPersistentDataUsesCoopDataDirectory();
             TestLegacyPersistenceMigrationIsScopedAndNonDestructive();
+            TestBannerlordUserDirMigratesFromDocumentsPersistence();
             TestClientSendsConfigRequestThroughCoopNetwork();
             ResetIntegrationTransport();
             TestClientFallsBackToLocalExecutionWhenCoopInactive();
@@ -119,6 +120,65 @@ public static class ContractRunner
         finally
         {
             Directory.Delete(root, recursive: true);
+        }
+    }
+
+    private static void TestBannerlordUserDirMigratesFromDocumentsPersistence()
+    {
+        Type paths = GetIntegrationDataPathsType();
+        FieldInfo directory = paths.GetField("_directory", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingFieldException(paths.FullName, "_directory");
+        MethodInfo filePath = paths.GetMethod("FilePath", BindingFlags.Public | BindingFlags.Static)
+            ?? throw new MissingMethodException(paths.FullName, "FilePath");
+        MethodInfo resolveDocumentsUserDirectory = paths.GetMethod("ResolveDocumentsUserDirectory", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingMethodException(paths.FullName, "ResolveDocumentsUserDirectory");
+
+        string? documentsRoot;
+        try
+        {
+            documentsRoot = (string?)resolveDocumentsUserDirectory.Invoke(null, null);
+        }
+        catch (TargetInvocationException)
+        {
+            documentsRoot = null;
+        }
+
+        if (string.IsNullOrEmpty(documentsRoot))
+        {
+            Console.WriteLine("SKIP TestBannerlordUserDirMigratesFromDocumentsPersistence: no Documents directory resolvable in this environment.");
+            return;
+        }
+
+        string documentsPersistent = Path.Combine(documentsRoot, "ImprovedGarrisons");
+        bool createdDocumentsPersistent = !Directory.Exists(documentsPersistent);
+        string bannerlordUserDirRoot = Path.Combine(Path.GetTempPath(), "ig-bannerlord-user-dir-contract-" + Guid.NewGuid().ToString("N"));
+        string? previous = Environment.GetEnvironmentVariable("BANNERLORD_USER_DIR");
+
+        Directory.CreateDirectory(documentsPersistent);
+        Directory.CreateDirectory(bannerlordUserDirRoot);
+        try
+        {
+            File.WriteAllText(Path.Combine(documentsPersistent, "settlement-settings.txt"), "documents-legacy-settings");
+
+            Environment.SetEnvironmentVariable("BANNERLORD_USER_DIR", bannerlordUserDirRoot);
+            directory.SetValue(null, null);
+
+            filePath.Invoke(null, new object[] { "contract-state.txt" });
+
+            string migrated = Path.Combine(bannerlordUserDirRoot, "ImprovedGarrisons", "settlement-settings.txt");
+            Assert(File.Exists(migrated) && File.ReadAllText(migrated) == "documents-legacy-settings",
+                "Setting BANNERLORD_USER_DIR did not migrate settlement settings previously persisted under the Documents-based directory.");
+        }
+        finally
+        {
+            directory.SetValue(null, null);
+            Environment.SetEnvironmentVariable("BANNERLORD_USER_DIR", previous);
+            Directory.Delete(bannerlordUserDirRoot, recursive: true);
+            File.Delete(Path.Combine(documentsPersistent, "settlement-settings.txt"));
+            if (createdDocumentsPersistent)
+            {
+                Directory.Delete(documentsPersistent, recursive: true);
+            }
         }
     }
 

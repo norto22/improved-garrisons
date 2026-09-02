@@ -1,4 +1,4 @@
-Improved Garrisons v1.0.6 - BannerlordCoop dedicated server
+Improved Garrisons v1.1.0 - BannerlordCoop dedicated server
 =============================================================
 
 This package is one custom Bannerlord module.
