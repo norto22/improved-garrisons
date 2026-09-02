@@ -223,10 +223,15 @@ jobs:
           fi
           changenote="${changenote}"$'\n\n'"Full changelog: ${RELEASE_URL}"
 
-          # VDF (KeyValues) quoted strings use backslash escaping; escape backslashes
-          # before quotes so a literal backslash in the PR body isn't double-escaped.
-          escaped_changenote="${changenote//\\/\\\\}"
-          escaped_changenote="${escaped_changenote//\"/\\\"}"
+          # steamcmd's workshop_build_item KeyValues parser has no working escape for an
+          # embedded double quote here: a literal `"` inside the value closes the quoted
+          # string early, and everything after it gets consumed as bogus tokens until the
+          # file's own closing brace trips "got } in key" at EOF (confirmed by run
+          # 33648462512 - the reported failure offset was exactly the file's byte length,
+          # and the PR body contained a literal "key name too long" quote pair; backslash-
+          # escaping the quote, tried previously, did not prevent this). Swap quotes for
+          # single quotes instead of trying to escape them.
+          changenote="${changenote//\"/\'}"
 
           vdf="$(mktemp --suffix=.vdf)"
           {
@@ -235,7 +240,7 @@ jobs:
             printf '\t"appid"\t\t\t"261550"\n'
             printf '\t"publishedfileid"\t"3793463493"\n'
             printf '\t"contentfolder"\t\t"%s"\n' "$CONTENT_FOLDER"
-            printf '\t"changenote"\t\t"%s"\n' "$escaped_changenote"
+            printf '\t"changenote"\t\t"%s"\n' "$changenote"
             printf '}\n'
           } > "$vdf"
           steamcmd +login "$STEAM_WORKSHOP_LOGIN" +workshop_build_item "$vdf" +quit
