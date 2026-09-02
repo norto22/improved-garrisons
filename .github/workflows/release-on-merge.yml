@@ -204,9 +204,22 @@ jobs:
           set -euo pipefail
           # Lead with the merged PR's own description, same text as the GitHub release
           # notes, then a link back to the full release page.
+          #
+          # steamcmd's workshop_build_item reads this VDF through Source's KeyValues text
+          # parser, which pools each quoted value and aborts the whole build once one
+          # crosses ~1024 chars (run 33646723566 failed at 1113 chars: "key name too
+          # long", then the parser desynced entirely on "got } in key"). Cap the PR body
+          # so the assembled changenote stays safely under that limit; the full text is
+          # still on the GitHub release itself.
+          max_body_len=800
+          pr_body_trimmed="$PR_BODY"
+          if [[ ${#pr_body_trimmed} -gt $max_body_len ]]; then
+            pr_body_trimmed="${pr_body_trimmed:0:$max_body_len}"$'\n\n'"... (see full release notes at the link below)"
+          fi
+
           changenote="Improved Garrisons ${RELEASE_TAG}"
           if [[ -n "$PR_BODY" ]]; then
-            changenote="${changenote}"$'\n\n'"${PR_BODY}"
+            changenote="${changenote}"$'\n\n'"${pr_body_trimmed}"
           fi
           changenote="${changenote}"$'\n\n'"Full changelog: ${RELEASE_URL}"
 
