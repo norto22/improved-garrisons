@@ -69,15 +69,13 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           MERGE_SHA: ${{ github.event.pull_request.merge_commit_sha }}
-          MODULE_VERSION: ${{ steps.package.outputs.module_version }}
           RELEASE_ARCHIVE: ${{ steps.package.outputs.release_archive }}
           RELEASE_TAG: ${{ steps.package.outputs.release_tag }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_BODY: ${{ github.event.pull_request.body }}
         shell: bash
         run: |
           set -euo pipefail
-          release_title="Improved Garrisons ${MODULE_VERSION} (PR #${PR_NUMBER})"
+          release_title="$RELEASE_TAG"
 
           # Use the merged PR's own description as the release notes when it has one.
           # `gh release create` can fall back to auto-generated notes for an
@@ -162,11 +160,14 @@ jobs:
   #   secret. Until both secrets exist, this job fails without affecting the GitHub
   #   release above, which already completed in the `release` job.
   #
-  # NOTE: steamcmd stores config/config.vdf relative to its OWN install directory, not
-  # $HOME/Steam - that path only exists because the secret-generation steps above happen
-  # to install steamcmd there by hand. CyberAndrii/setup-steamcmd installs into the
-  # runner's tool-cache instead, so the restore step below must target
-  # steps.steamcmd.outputs.directory, not $HOME/Steam.
+  # NOTE: steamcmd always stores config/config.vdf under $HOME/Steam, regardless of where
+  # the steamcmd binary itself is installed - confirmed from a live run's own log: even
+  # when CyberAndrii/setup-steamcmd invokes steamcmd.sh by full absolute path from
+  # /opt/hostedtoolcache/steamcmd/..., steamcmd still logs "Redirecting stderr to
+  # '/home/runner/Steam/logs/stderr.txt'". A prior version of this step wrote config.vdf
+  # to steps.steamcmd.outputs.directory instead, which steamcmd never looked at, so
+  # login always fell through to "Cached credentials not found" + an empty interactive
+  # password prompt. The restore step below must target $HOME/Steam.
   publish-on-steam:
     name: Publish on Steam Workshop
     needs: [release, stage-module]
@@ -175,7 +176,6 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Setup steamcmd
-        id: steamcmd
         uses: CyberAndrii/setup-steamcmd@v1
 
       - name: Download module artifact
@@ -187,9 +187,9 @@ jobs:
       - name: Restore persisted Steam login session
         env:
           CONFIG_VDF_B64: ${{ secrets.STEAM_WORKSHOP_CONFIG_VDF }}
-          STEAMCMD_DIR: ${{ steps.steamcmd.outputs.directory }}
         run: |
           set -euo pipefail
+          STEAMCMD_DIR="$HOME/Steam"
           mkdir -p "$STEAMCMD_DIR/config"
           printf '%s' "$CONFIG_VDF_B64" | base64 -d > "$STEAMCMD_DIR/config/config.vdf"
 
