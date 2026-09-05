@@ -172,9 +172,13 @@ jobs:
     name: Publish on Steam Workshop
     needs: [release, stage-module]
     runs-on: ubuntu-latest
-    permissions: {}
+    permissions:
+      contents: read
     timeout-minutes: 15
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
       - name: Setup steamcmd
         uses: CyberAndrii/setup-steamcmd@v1
 
@@ -200,6 +204,7 @@ jobs:
           RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.release.outputs.release_tag }}
           PR_BODY: ${{ github.event.pull_request.body }}
           CONTENT_FOLDER: ${{ github.workspace }}/artifact/Modules/ImprovedGarrisons
+          PREVIEW_FILE: ${{ github.workspace }}/ImprovedGarrisonsThumbnail.png
         run: |
           set -euo pipefail
           # Lead with the merged PR's own description, same text as the GitHub release
@@ -240,6 +245,7 @@ jobs:
             printf '\t"appid"\t\t\t"261550"\n'
             printf '\t"publishedfileid"\t"3793463493"\n'
             printf '\t"contentfolder"\t\t"%s"\n' "$CONTENT_FOLDER"
+            printf '\t"previewfile"\t\t"%s"\n' "$PREVIEW_FILE"
             printf '\t"changenote"\t\t"%s"\n' "$changenote"
             printf '}\n'
           } > "$vdf"

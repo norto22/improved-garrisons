@@ -1,4 +1,4 @@
-Improved Garrisons v1.1.3 - BannerlordCoop dedicated server
+Improved Garrisons v1.1.4 - BannerlordCoop dedicated server
 =============================================================
 
 This package is one custom Bannerlord module.
@@ -6,9 +6,9 @@ This package is one custom Bannerlord module.
 The BannerlordCoop appliance launches a fixed module set (Coop,
 DedicatedServer.Windows, Native, SandBox, SandBoxCore) and accepts only one
 primary DedicatedServer.Windows submodule. A module folder dropped next to
-those five is never loaded, no matter what modded-server-modules.txt says --
-that file is bookkeeping the egg's own startup script maintains for display
-purposes; nothing in the engine reads it to decide what to load.
+those five is never loaded, no matter what a hosting setup's own bookkeeping
+files claim is active; nothing in the engine reads those files to decide what
+to load.
 
 ServerInstall/DedicatedServer.Windows.SubModule.xml is the only mechanism that
 makes the appliance actually run Improved Garrisons code. It adds a second
@@ -20,6 +20,26 @@ submodule first, forwards its real lifecycle overrides, waits for
 BannerlordCoop's native MobileParty registry and constructor prefix to be
 ready, and only then activates Improved Garrisons server simulation.
 
+Prerequisites
+-------------
+
+  - A working BannerlordCoop dedicated server, already installed and able to
+    boot on its own before you add this module. This release is built and
+    tested against game v1.4.8 and BannerlordCoop build v0.1.4+6df9901; other
+    versions are unverified.
+  - File access to that dedicated server's own install root -- the folder
+    that directly contains its "engine/" subfolder (this is BannerlordCoop's
+    own dedicated-server layout, the same regardless of whether you deployed
+    it through a hosting panel, plain Docker, or by hand). Every path below
+    is written relative to that root.
+  - The ability to create a file link there, not just copy files: on a
+    Linux/Wine-hosted server that is `ln -s`; on a native Windows host it is
+    `mklink`. Steps 3-4 explain why a plain copy silently breaks updates.
+  - Some hosting setups (for example an automated panel script) already do
+    steps 3-4 for you on every boot. Check for that first -- rerunning them
+    by hand is harmless either way -- and use the Verification section below
+    to confirm the result regardless of how it was applied.
+
 Install
 -------
 
@@ -28,14 +48,20 @@ Install
 
      engine/Modules/ImprovedGarrisons
 
-3. The appliance's own startup script (an egg/Docker-level setting, not a
-   file in this package) is expected to symlink
-   ImprovedGarrisons.CoopBootstrap.dll into both
+3. ImprovedGarrisons.CoopBootstrap.dll must be reachable from both
    engine/Modules/DedicatedServer.Windows/bin/Win64_Shipping_Client/ and
-   .../Win64_Shipping_Server/ automatically on every boot. Confirm those
-   symlinks exist before continuing; if the appliance you're deploying to
-   doesn't create them, create them yourself, pointing at the DLL inside
-   this ImprovedGarrisons folder -- never a separate copy.
+   .../Win64_Shipping_Server/ -- as a link to the DLL inside this
+   ImprovedGarrisons folder, never a separate copy (a copy will not receive
+   future updates and will silently drift from the real module). If nothing
+   already creates these links for you, create them yourself, for example
+   on a Linux/Wine host:
+
+     ln -sf <path-to>/ImprovedGarrisons/bin/Win64_Shipping_Client/ImprovedGarrisons.CoopBootstrap.dll \
+       engine/Modules/DedicatedServer.Windows/bin/Win64_Shipping_Client/ImprovedGarrisons.CoopBootstrap.dll
+     ln -sf <path-to>/ImprovedGarrisons/bin/Win64_Shipping_Server/ImprovedGarrisons.CoopBootstrap.dll \
+       engine/Modules/DedicatedServer.Windows/bin/Win64_Shipping_Server/ImprovedGarrisons.CoopBootstrap.dll
+
+   On a native Windows host, use `mklink` to the same effect.
 4. Back up engine/Modules/DedicatedServer.Windows/SubModule.xml, then replace
    it with the content of:
 
@@ -43,12 +69,13 @@ Install
 
 5. Start the server.
 
-Verification (do this, not just reading the console banner)
+Verification (do this, not just reading a console banner)
 --------------------------------------------------------------
 
-The egg's "[egg] active modded server modules: ImprovedGarrisons" banner only
-proves the egg's own bookkeeping file was updated -- it does NOT prove the
-engine loaded the module. Confirm the real thing instead:
+A hosting setup's own startup banner (for example one that lists "active
+modded server modules") only proves that setup's own bookkeeping was
+updated -- it does NOT prove the engine loaded the module. Confirm the real
+thing instead:
 
   - engine/Modules/ImprovedGarrisons/ModuleData/CoopRuntime.status must exist
     after the server finishes booting. Its absence means step 4 above was not
