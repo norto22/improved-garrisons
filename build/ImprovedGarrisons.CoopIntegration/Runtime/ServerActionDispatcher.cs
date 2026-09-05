@@ -600,7 +600,7 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
             return Accept(request, "updated", "IG: settings copied to " + copied + " garrisons.");
         }
 
-        private static string ResolvePeerClanId(NetPeer peer)
+        internal static string ResolvePeerClanId(NetPeer peer)
         {
             if (!ContainerProvider.TryResolve(out IPlayerManager playerManager)
                 || !ContainerProvider.TryResolve(out IObjectManager objectManager))

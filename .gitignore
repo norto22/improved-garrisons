@@ -21,4 +21,6 @@ pterodactyl-egg/
 # Agents
 .claude/
 .codex/
+.agents/
 CLAUDE.md
+AGENTS.md

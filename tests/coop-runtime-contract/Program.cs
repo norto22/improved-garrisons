@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Autofac;
 using Common;
 using Common.LogicStates;
@@ -17,7 +18,10 @@ using GameInterface.Services.GameState.Interfaces;
 using GameInterface.Services.Players.Data;
 using GameInterface.Services.Time.Interfaces;
 using GameInterface.Services.UI.Interfaces;
+using ImprovedGarrisons;
 using ImprovedGarrisons.CoopIntegration.Protocol;
+using ImprovedGarrisons.SaveSystem;
+using ImprovedGarrisons.SaveSystem.SaveData.DataTypes;
 using LiteNetLib;
 
 namespace ImprovedGarrisons.CoopRuntimeContract;
@@ -41,6 +45,7 @@ public static class ContractRunner
             ResetIntegrationTransport();
             TestSettingSliderDragCoalescesToOneSend();
             test_apply_setting_slider_updates_return_silent_success();
+            test_apply_state_prunes_settlement_no_longer_in_authoritative_sync();
             Console.WriteLine($"PASS {TestName}");
             return 0;
         }
@@ -330,6 +335,44 @@ public static class ContractRunner
             Assert(code == "updated", $"{operation} returned outcome code '{code}' instead of 'updated'.");
             Assert(string.IsNullOrEmpty(text),
                 $"{operation} returned success chat text '{text}'; routine slider updates must be silent.");
+        }
+    }
+
+    private static void test_apply_state_prunes_settlement_no_longer_in_authoritative_sync()
+    {
+        ModInformation.IsServer = false;
+        GarrisonBehavior? previousBehavior = Main.GarrisonBehavior;
+        Main.GarrisonBehavior = new GarrisonBehavior();
+        try
+        {
+            Main.GarrisonBehavior.SettlementSettingsData["My Town"] = new GarrisonSettings { MaxUpgradeTier = 1 };
+            Main.GarrisonBehavior.SettlementSettingsData["Foreign Town"] = new GarrisonSettings { MaxUpgradeTier = 3 };
+            Main.GarrisonBehavior.SettlementSettingsData["Npc Town"] = new NPCGarrisonSettings();
+
+            // Simulates the authoritative sync a correctly clan-scoped server would send: it names only
+            // the settlements the receiving peer's own clan still owns -- "Foreign Town" is deliberately
+            // absent, standing in for a settlement that belongs to a different clan.
+            string authoritativeSyncText = "[" + Convert.ToBase64String(Encoding.UTF8.GetBytes("My Town")) + "]\n";
+
+            Type store = typeof(ConfigRequest).Assembly.GetType(
+                "ImprovedGarrisons.CoopIntegration.Persistence.SettingsStateStore",
+                throwOnError: true)!;
+            MethodInfo applyState = store.GetMethod("ApplyState", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new MissingMethodException(store.FullName, "ApplyState");
+
+            applyState.Invoke(null, new object?[] { authoritativeSyncText, string.Empty, 1L });
+
+            Assert(Main.GarrisonBehavior.SettlementSettingsData.ContainsKey("My Town"),
+                "Applying an authoritative sync removed a settlement the peer's own clan still owns.");
+            Assert(Main.GarrisonBehavior.SettlementSettingsData.ContainsKey("Npc Town"),
+                "Applying an authoritative sync removed a local NPC-tracked settlement entry, which is never network-managed.");
+            Assert(!Main.GarrisonBehavior.SettlementSettingsData.ContainsKey("Foreign Town"),
+                "Applying an authoritative sync that no longer names a previously-held foreign settlement did not " +
+                "remove it -- a stale entry from an earlier unscoped sync survives indefinitely.");
+        }
+        finally
+        {
+            Main.GarrisonBehavior = previousBehavior;
         }
     }
 

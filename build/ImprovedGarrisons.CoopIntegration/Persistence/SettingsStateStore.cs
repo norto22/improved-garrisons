@@ -9,6 +9,7 @@ using System.Xml;
 using ImprovedGarrisons.ActivityLogging;
 using ImprovedGarrisons.CoopIntegration.Runtime;
 using ImprovedGarrisons.SaveSystem.SaveData.DataTypes;
+using TaleWorlds.CampaignSystem.Settlements;
 
 namespace ImprovedGarrisons.CoopIntegration.Persistence
 {
@@ -51,7 +52,7 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
             }
         }
 
-        public static string BuildSettingsText()
+        public static string BuildSettingsText(string? clanIdFilter = null)
         {
             Dictionary<string, GarrisonSettings>? settings = global::ImprovedGarrisons.Main.GarrisonBehavior?.SettlementSettingsData;
             if (settings == null)
@@ -66,6 +67,11 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
             {
                 GarrisonSettings value = settings[key];
                 if (value == null || value is NPCGarrisonSettings)
+                {
+                    continue;
+                }
+
+                if (clanIdFilter != null && !string.Equals(ResolveOwnerClanId(key), clanIdFilter, StringComparison.Ordinal))
                 {
                     continue;
                 }
@@ -116,6 +122,22 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
             }
 
             return builder.ToString();
+        }
+
+        // Mirrors the settlement-name lookup GarrisonBehavior.GetAllPlayerSettlements() already uses for the
+        // single-player invariant, so a clan-scoped sync only ever reports what that invariant would allow.
+        private static string? ResolveOwnerClanId(string settlementKey)
+        {
+            foreach (Settlement settlement in Settlement.All)
+            {
+                if (settlement?.Town != null && (settlement.Town.IsCastle || settlement.Town.IsTown)
+                    && string.Equals(settlement.Name.ToString(), settlementKey, StringComparison.Ordinal))
+                {
+                    return settlement.OwnerClan?.StringId;
+                }
+            }
+
+            return null;
         }
 
         public static string BuildActivityText()
@@ -202,7 +224,11 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
 
             try
             {
-                ApplySettingsText(settingsText ?? string.Empty);
+                // A network-delivered sync is now clan-scoped and authoritative for this peer's own clan
+                // (see BuildSettingsText's clanIdFilter), so anything it no longer names -- most commonly a
+                // stale foreign-clan entry from before this fix, or before this peer's clan was registered --
+                // must be dropped here rather than accumulating forever.
+                ApplySettingsText(settingsText ?? string.Empty, pruneAbsentKeys: true);
                 ApplyActivityText(activityText ?? string.Empty);
                 _remoteRevision = revision;
                 Revision = revision;
@@ -268,7 +294,7 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                 IntegrationLog.Error("settings persist failed: " + exception.Message);
             }
 
-            IntegrationTransport.BroadcastState(settings, activity, Revision);
+            IntegrationTransport.BroadcastState(activity, Revision);
         }
 
         private static void RestoreSettings()
@@ -293,7 +319,7 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
             }
         }
 
-        private static void ApplySettingsText(string text)
+        private static void ApplySettingsText(string text, bool pruneAbsentKeys = false)
         {
             Dictionary<string, GarrisonSettings>? allSettings = global::ImprovedGarrisons.Main.GarrisonBehavior?.SettlementSettingsData;
             if (allSettings == null || string.IsNullOrEmpty(text))
@@ -301,6 +327,7 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                 return;
             }
 
+            HashSet<string>? incomingKeys = pruneAbsentKeys ? new HashSet<string>(StringComparer.Ordinal) : null;
             GarrisonSettings? current = null;
             foreach (string rawLine in text.Split('\n'))
             {
@@ -313,6 +340,7 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                 if (line[0] == '[' && line[line.Length - 1] == ']')
                 {
                     string key = Decode(line.Substring(1, line.Length - 2));
+                    incomingKeys?.Add(key);
                     if (!allSettings.TryGetValue(key, out current) || current == null || current is NPCGarrisonSettings)
                     {
                         current = new GarrisonSettings();
@@ -353,6 +381,25 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                 else if (PropertiesByName.TryGetValue(name, out PropertyInfo property))
                 {
                     SetPrimitive(property, current, value);
+                }
+            }
+
+            if (incomingKeys != null)
+            {
+                List<string> staleKeys = new List<string>();
+                foreach (KeyValuePair<string, GarrisonSettings> entry in allSettings)
+                {
+                    if (entry.Value is NPCGarrisonSettings || incomingKeys.Contains(entry.Key))
+                    {
+                        continue;
+                    }
+
+                    staleKeys.Add(entry.Key);
+                }
+
+                foreach (string staleKey in staleKeys)
+                {
+                    allSettings.Remove(staleKey);
                 }
             }
         }
