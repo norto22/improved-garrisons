@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>ImprovedGarrisons</AssemblyName>
-    <Version>1.1.0</Version>
+    <Version>1.1.3</Version>
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <TargetFramework>net472</TargetFramework>
     <PlatformTarget>x64</PlatformTarget>

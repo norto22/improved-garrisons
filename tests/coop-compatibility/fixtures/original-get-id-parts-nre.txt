@@ -1,0 +1,8 @@
+Historical pre-fix stack signature from ErrorLog.xml:
+
+There was an error in method InitializeNewParty Exception: Object reference not set to an instance of an object.
+at TaleWorlds.CampaignSystem.CampaignObjectManager.CampaignObjectType`1.GetIdParts(String stringId)
+at TaleWorlds.CampaignSystem.CampaignObjectManager.CampaignObjectType`1.OnItemAdded(T item)
+at TaleWorlds.CampaignSystem.CampaignObjectManager.AddMobileParty_Patch1(CampaignObjectManager this, MobileParty party)
+at TaleWorlds.CampaignSystem.Party.MobileParty.CreateParty_Patch2(String stringId, PartyComponent component)
+at ImprovedGarrisons.AI.AIManagers.PartyManager.InitializeNewParty(String id, TextObject partyName, Settlement homeSettlement, Settlement spawnOn)

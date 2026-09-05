@@ -202,11 +202,19 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
             }
         }
 
-        public static void BroadcastState(string settingsText, string activityText, long revision)
+        public static void BroadcastState(string activityText, long revision)
         {
             if (_network != null && IntegrationRuntime.IsServer)
             {
-                SendToSynchronizedPeers(new StateSync { SettingsText = settingsText, ActivityText = activityText, Revision = revision });
+                // Each peer gets its own clan-scoped settings text -- StateSync must never be a single shared
+                // message here, unlike PartyManifest/ServerHealth, or one peer's dictionary would accumulate
+                // every other clan's settlement entries.
+                SendToSynchronizedPeers(peer => new StateSync
+                {
+                    SettingsText = SettingsStateStore.BuildSettingsText(ServerActionDispatcher.ResolvePeerClanId(peer)),
+                    ActivityText = activityText,
+                    Revision = revision
+                });
             }
         }
 
@@ -315,10 +323,11 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
 
             GameThread.RunSafe(() =>
             {
+                string peerClanId = ServerActionDispatcher.ResolvePeerClanId(peer);
                 network.SendImmediate(peer, new ConfigSync { ConfigXml = SettingsStateStore.ReadConfigXml(), Revision = SettingsStateStore.Revision });
                 network.SendImmediate(peer, new StateSync
                 {
-                    SettingsText = SettingsStateStore.BuildSettingsText(),
+                    SettingsText = SettingsStateStore.BuildSettingsText(peerClanId),
                     ActivityText = SettingsStateStore.BuildActivityText(),
                     Revision = SettingsStateStore.Revision
                 });
@@ -409,6 +418,11 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
 
         private static void SendToSynchronizedPeers(IMessage message)
         {
+            SendToSynchronizedPeers(_ => message);
+        }
+
+        private static void SendToSynchronizedPeers(Func<NetPeer, IMessage> messageFactory)
+        {
             INetwork? network = _network;
             if (network == null || !IntegrationRuntime.IsServer ||
                 !ContainerProvider.TryResolve(out IConnectionCollection connections))
@@ -422,7 +436,7 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
                 if (peer.ConnectionState == ConnectionState.Connected &&
                     connections.HasCompletedCampaignSynchronization(peer))
                 {
-                    network.Send(peer, message);
+                    network.Send(peer, messageFactory(peer));
                 }
             }
         }

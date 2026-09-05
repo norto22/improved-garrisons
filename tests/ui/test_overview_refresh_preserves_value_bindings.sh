@@ -145,13 +145,27 @@ record_slider_failure() {
 }
 
 module_dir="${subject_dll:h:h:h}"
-slider_prefabs=(
-	"$module_dir/GUI/Prefabs/UIElements/ImprovedGarrisonsBottomListPanel.xml"
+
+# The local (non-Coop) config-menu slider defers its writeback until release -- its handle still tracks
+# the drag smoothly (TaleWorlds.GauntletUI.BaseTypes.SliderWidget.ValueFloat always updates _valueFloat and
+# the handle position unconditionally), only the OnValueFloatChanged/OnPropertyChanged commit callback is
+# gated on release.
+slider_defer_prefabs=(
 	"$module_dir/GUI/Prefabs/ImprovedGarrisonsCategory.xml"
+)
+
+# Coop-forwarded settings sliders deliberately do NOT defer (commit f4289c4): SliderWidget freezes any UI
+# element bound to that commit callback for the whole drag when UpdateValueOnRelease="true", which is what
+# made these two feel broken in the first place. Network spam from the callback firing on every drag tick
+# is independently coalesced by ClientServerPatches.SendSettingThrottled's 200ms per-(setting, settlement)
+# throttle -- see TestSettingSliderDragCoalescesToOneSend in tests/coop-runtime-contract. Re-adding
+# UpdateValueOnRelease here would reintroduce the frozen-label regression with no compensating benefit.
+slider_continuous_prefabs=(
+	"$module_dir/GUI/Prefabs/UIElements/ImprovedGarrisonsBottomListPanel.xml"
 	"$module_dir/GUI/Prefabs/UITabs/ImprovedGarrisonsTrainingMenu.xml"
 )
 
-for slider_prefab in "${slider_prefabs[@]}"; do
+for slider_prefab in "${slider_defer_prefabs[@]}"; do
 	if [[ ! -f "$slider_prefab" ]]; then
 		record_slider_failure "slider prefab is missing from the deployed module: $slider_prefab"
 		continue
@@ -161,7 +175,21 @@ for slider_prefab in "${slider_prefabs[@]}"; do
 	if [[ -z "$slider_tags" ]]; then
 		record_slider_failure "slider prefab contains no SliderWidget: $slider_prefab"
 	elif print -r -- "$slider_tags" | rtk rg -v -q 'UpdateValueOnRelease="true"'; then
-		record_slider_failure "slider commits while pressed instead of deferring writeback until release: $slider_prefab"
+		record_slider_failure "local (non-Coop) slider commits while pressed instead of deferring writeback until release: $slider_prefab"
+	fi
+done
+
+for slider_prefab in "${slider_continuous_prefabs[@]}"; do
+	if [[ ! -f "$slider_prefab" ]]; then
+		record_slider_failure "slider prefab is missing from the deployed module: $slider_prefab"
+		continue
+	fi
+
+	slider_tags="$(rtk rg '<SliderWidget ' "$slider_prefab")"
+	if [[ -z "$slider_tags" ]]; then
+		record_slider_failure "slider prefab contains no SliderWidget: $slider_prefab"
+	elif print -r -- "$slider_tags" | rtk rg -q 'UpdateValueOnRelease="true"'; then
+		record_slider_failure "Coop-forwarded slider defers its writeback, which freezes its bound label for the whole drag: $slider_prefab"
 	fi
 done
 
