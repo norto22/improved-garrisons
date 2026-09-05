@@ -204,7 +204,7 @@ jobs:
           RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/${{ needs.release.outputs.release_tag }}
           PR_BODY: ${{ github.event.pull_request.body }}
           CONTENT_FOLDER: ${{ github.workspace }}/artifact/Modules/ImprovedGarrisons
-          PREVIEW_FILE: ${{ github.workspace }}/ImprovedGarrisonsThumbnail.png
+          PREVIEW_FILE: ${{ github.workspace }}/ImprovedGarrisonsThumbnail.jpg
         run: |
           set -euo pipefail
           # Lead with the merged PR's own description, same text as the GitHub release
