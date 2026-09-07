@@ -46,6 +46,10 @@ public static class ContractRunner
             TestSettingSliderDragCoalescesToOneSend();
             test_apply_setting_slider_updates_return_silent_success();
             test_apply_state_prunes_settlement_no_longer_in_authoritative_sync();
+            ResetIntegrationTransport();
+            TestClientRevisionResetsAfterServerRestart();
+            TestServerClanRegistryTreatsRegisteredClanAsPlayerOwned();
+            TestDocumentsRootFallsBackWhenPlatformHelperLacksDocumentsPath();
             Console.WriteLine($"PASS {TestName}");
             return 0;
         }
@@ -189,29 +193,7 @@ public static class ContractRunner
 
     private static void TestClientSendsConfigRequestThroughCoopNetwork()
     {
-        ModInformation.IsServer = false;
-        MessageBroker broker = new();
-        RecordingNetwork network = new();
-        SerializableTypeMapper mapper = new();
-        FakeClientLogic logic = new();
-        CampaignState campaignState = new(
-            logic,
-            broker,
-            network,
-            CreateDefaultProxy<ILoadingInterface>(),
-            CreateDefaultProxy<IGameStateInterface>(),
-            CreateDefaultProxy<ICoopFinalizer>(),
-            CreateDefaultProxy<IMapTimeTrackerInterface>());
-        logic.State = campaignState;
-
-        using IContainer container = BuildContainer(builder =>
-        {
-            builder.RegisterInstance(logic).As<IClientLogic>();
-            RegisterCommon(builder, broker, network, mapper);
-        });
-        ContainerProvider.SetContainer(container);
-
-        InvokeTransport("Poll");
+        (RecordingNetwork network, SerializableTypeMapper mapper) = ConnectAsClient();
 
         Assert(network.SentAll.Any(message => message is ConfigRequest),
             "The shipped client runtime did not send ConfigRequest through BannerlordCoop INetwork.");
@@ -238,29 +220,7 @@ public static class ContractRunner
 
     private static void TestSettingSliderDragCoalescesToOneSend()
     {
-        ModInformation.IsServer = false;
-        MessageBroker broker = new();
-        RecordingNetwork network = new();
-        SerializableTypeMapper mapper = new();
-        FakeClientLogic logic = new();
-        CampaignState campaignState = new(
-            logic,
-            broker,
-            network,
-            CreateDefaultProxy<ILoadingInterface>(),
-            CreateDefaultProxy<IGameStateInterface>(),
-            CreateDefaultProxy<ICoopFinalizer>(),
-            CreateDefaultProxy<IMapTimeTrackerInterface>());
-        logic.State = campaignState;
-
-        using IContainer container = BuildContainer(builder =>
-        {
-            builder.RegisterInstance(logic).As<IClientLogic>();
-            RegisterCommon(builder, broker, network, mapper);
-        });
-        ContainerProvider.SetContainer(container);
-
-        InvokeTransport("Poll");
+        (RecordingNetwork network, _) = ConnectAsClient();
 
         Type patches = typeof(ConfigRequest).Assembly.GetType(
             "ImprovedGarrisons.CoopIntegration.Patching.ClientServerPatches",
@@ -376,6 +336,107 @@ public static class ContractRunner
         }
     }
 
+    private static void TestClientRevisionResetsAfterServerRestart()
+    {
+        ConnectAsClient();
+
+        Type store = typeof(ConfigRequest).Assembly.GetType(
+            "ImprovedGarrisons.CoopIntegration.Persistence.SettingsStateStore", throwOnError: true)!;
+        FieldInfo remoteRevisionField = store.GetField("_remoteRevision", BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingFieldException(store.FullName, "_remoteRevision");
+        MethodInfo applyState = store.GetMethod("ApplyState", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new MissingMethodException(store.FullName, "ApplyState");
+        PropertyInfo revisionProperty = store.GetProperty("Revision", BindingFlags.Public | BindingFlags.Static)
+            ?? throw new MissingMemberException(store.FullName, "Revision");
+
+        // Force a known baseline, independent of whatever earlier tests in this sequential run left
+        // behind: a sentinel Revision that is neither 0 nor the value expected after a successful apply.
+        revisionProperty.SetValue(null, -1L);
+        // Simulate having already synced with a server that had climbed to revision 100 before it restarted.
+        remoteRevisionField.SetValue(null, 100L);
+
+        // The server restarts: BannerlordCoop rebuilds the client's container, so the transport observes
+        // a new broker/network on the next Poll() and tears down before re-subscribing -- exactly like a
+        // real reconnect (IntegrationTransport.Poll, which detects the container change and calls Teardown).
+        ResetIntegrationTransport();
+        ConnectAsClient();
+
+        // The freshly-restarted server's first sync always starts at a low revision.
+        applyState.Invoke(null, new object?[] { string.Empty, string.Empty, 1L });
+
+        long revisionAfter = (long)revisionProperty.GetValue(null)!;
+        Assert(revisionAfter == 1,
+            "A client reconnecting after a server restart kept its pre-restart revision watermark (100), " +
+            "so the fresh server's low revision (1) was silently rejected instead of applied (Revision " +
+            "stayed at " + revisionAfter + ").");
+    }
+
+    private static void TestServerClanRegistryTreatsRegisteredClanAsPlayerOwned()
+    {
+        Type registryType = typeof(ConfigRequest).Assembly.GetType(
+            "ImprovedGarrisons.CoopIntegration.Persistence.ServerClanRegistry", throwOnError: true)!;
+        MethodInfo record = registryType.GetMethod("Record", new[] { typeof(string) })
+            ?? throw new MissingMethodException(registryType.FullName, "Record(string)");
+        MethodInfo isNpcGarrison = registryType.GetMethod("IsNpcGarrison", BindingFlags.Public | BindingFlags.Static)
+            ?? throw new MissingMethodException(registryType.FullName, "IsNpcGarrison");
+
+        string clanId = "contract-test-clan-" + Guid.NewGuid().ToString("N");
+
+        Assert((bool)isNpcGarrison.Invoke(null, new object?[] { clanId })!,
+            "An unregistered clan id was not treated as an NPC garrison by default.");
+
+        record.Invoke(null, new object?[] { clanId });
+
+        Assert(!(bool)isNpcGarrison.Invoke(null, new object?[] { clanId })!,
+            "A clan Improved Garrisons has already recorded as a connected player's clan (via an " +
+            "authorized server action) was still classified as an NPC garrison -- exactly what happens " +
+            "on a dedicated server, where MobileParty.MainParty.ActualClan is always null after Coop " +
+            "removes the server's main party at boot.");
+    }
+
+    // Deliberately does not exercise the full SaveFilesPath property: it also calls
+    // Utilities.GetApplicationName()/EngineFilePaths.ConfigsPath, both of which need the actual game
+    // engine and throw a bare NullReferenceException in this console process regardless of the fix under
+    // test here. IGSaveFilePath.ResolveDocumentsRoot() isolates exactly the documents-root resolution
+    // this bug is about, with no engine dependency.
+    private static void TestDocumentsRootFallsBackWhenPlatformHelperLacksDocumentsPath()
+    {
+        TaleWorlds.Library.IPlatformFileHelper? previousHelper = TaleWorlds.Library.Common.PlatformFileHelper;
+        TaleWorlds.Library.Common.PlatformFileHelper = CreateDefaultProxy<TaleWorlds.Library.IPlatformFileHelper>();
+        try
+        {
+            Type pathType = typeof(Main).Assembly.GetType(
+                "ImprovedGarrisons.SaveSystem.FilePaths.IGSaveFilePath", throwOnError: true)!;
+            MethodInfo tryReflected = pathType.GetMethod("TryResolveReflectedDocumentsPath", BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new MissingMethodException(pathType.FullName, "TryResolveReflectedDocumentsPath");
+            MethodInfo resolveRoot = pathType.GetMethod("ResolveDocumentsRoot", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)
+                ?? throw new MissingMethodException(pathType.FullName, "ResolveDocumentsRoot");
+
+            string? reflected = (string?)tryReflected.Invoke(null, null);
+            Assert(string.IsNullOrEmpty(reflected),
+                "Sanity check failed: a DispatchProxy stub standing in for the dedicated server's real " +
+                "launcher wrapper unexpectedly exposed a DocumentsPath value ('" + reflected + "').");
+
+            // Asserting non-null rather than non-empty deliberately: whether SpecialFolder.Personal itself
+            // resolves to a non-empty path is an OS/container concern (this sandbox has no XDG user-dirs
+            // config, so it resolves to ""), separate from and outside the scope of this fix. What the bug
+            // actually did was return null -- signalling total resolution failure -- instead of ever
+            // reaching Environment.GetFolderPath at all. A non-null result (empty or not) proves the
+            // fallback branch was taken.
+            string? resolvedRoot = (string?)resolveRoot.Invoke(null, null);
+            Assert(resolvedRoot != null,
+                "IGSaveFilePath's documents-root resolution returned null when Common.PlatformFileHelper " +
+                "does not expose a DocumentsPath member (a DispatchProxy stub standing in for the dedicated " +
+                "server's real launcher wrapper) instead of falling back to " +
+                "Environment.GetFolderPath(SpecialFolder.Personal) -- settings/config would silently never " +
+                "save on the dedicated server.");
+        }
+        finally
+        {
+            TaleWorlds.Library.Common.PlatformFileHelper = previousHelper;
+        }
+    }
+
     private static void TestServerSubscribesAndRepliesThroughCoopNetwork()
     {
         ModInformation.IsServer = true;
@@ -424,6 +485,37 @@ public static class ContractRunner
         builder.RegisterInstance(broker).As<IMessageBroker>();
         builder.RegisterInstance(network).As<INetwork>();
         builder.RegisterInstance(mapper).As<ISerializableTypeMapper>();
+    }
+
+    // Shared client-side connection setup used by every test that needs the transport hooked up as a
+    // client against a fake Coop network. Each call registers a fresh container, so calling this twice
+    // in the same test (with a teardown in between) simulates a reconnect to a different server process.
+    private static (RecordingNetwork Network, SerializableTypeMapper Mapper) ConnectAsClient()
+    {
+        ModInformation.IsServer = false;
+        MessageBroker broker = new();
+        RecordingNetwork network = new();
+        SerializableTypeMapper mapper = new();
+        FakeClientLogic logic = new();
+        CampaignState campaignState = new(
+            logic,
+            broker,
+            network,
+            CreateDefaultProxy<ILoadingInterface>(),
+            CreateDefaultProxy<IGameStateInterface>(),
+            CreateDefaultProxy<ICoopFinalizer>(),
+            CreateDefaultProxy<IMapTimeTrackerInterface>());
+        logic.State = campaignState;
+
+        IContainer container = BuildContainer(builder =>
+        {
+            builder.RegisterInstance(logic).As<IClientLogic>();
+            RegisterCommon(builder, broker, network, mapper);
+        });
+        ContainerProvider.SetContainer(container);
+
+        InvokeTransport("Poll");
+        return (network, mapper);
     }
 
     private static void ResetIntegrationTransport()

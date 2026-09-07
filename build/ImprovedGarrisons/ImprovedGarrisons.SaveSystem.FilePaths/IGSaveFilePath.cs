@@ -25,16 +25,7 @@ namespace ImprovedGarrisons.SaveSystem.FilePaths
 				}
 				try
 				{
-					string text = null;
-					if (Platform.GDKDesktop == ApplicationPlatform.CurrentPlatform)
-					{
-						text = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-					}
-					else
-					{
-						PropertyInfo property = Common.PlatformFileHelper.GetType().GetProperty("DocumentsPath", BindingFlags.Instance | BindingFlags.NonPublic);
-						text = (string)property.GetValue(Common.PlatformFileHelper);
-					}
+					string text = ResolveDocumentsRoot();
 					text = System.IO.Path.Combine(text, Utilities.GetApplicationName(), EngineFilePaths.ConfigsPath.Path, "ImprovedGarrisons", "Saves");
 					if (text == null || text == "")
 					{
@@ -55,6 +46,39 @@ namespace ImprovedGarrisons.SaveSystem.FilePaths
 		public bool PathIsValid()
 		{
 			return SaveFilesPath != null;
+		}
+
+		private static string ResolveDocumentsRoot()
+		{
+			if (Platform.GDKDesktop == ApplicationPlatform.CurrentPlatform)
+			{
+				return Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+			}
+
+			string reflected = TryResolveReflectedDocumentsPath();
+			if (!string.IsNullOrEmpty(reflected))
+			{
+				return reflected;
+			}
+
+			// The dedicated-server launcher installs its own IPlatformFileHelper wrapper that never
+			// exposes DocumentsPath (only the interface members), so the reflection above finds nothing
+			// there. Fall back to .NET's own equivalent -- it's what the real PlatformFileHelperPC.DocumentsPath
+			// returns internally on this platform anyway.
+			return Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+		}
+
+		private static string TryResolveReflectedDocumentsPath()
+		{
+			try
+			{
+				PropertyInfo property = Common.PlatformFileHelper.GetType().GetProperty("DocumentsPath", BindingFlags.Instance | BindingFlags.NonPublic);
+				return property != null ? (string)property.GetValue(Common.PlatformFileHelper) : null;
+			}
+			catch (Exception)
+			{
+				return null;
+			}
 		}
 	}
 }

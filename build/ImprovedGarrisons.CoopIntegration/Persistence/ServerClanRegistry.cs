@@ -8,19 +8,30 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
     {
         private static readonly HashSet<string> ClanIds = new HashSet<string>(StringComparer.Ordinal);
 
-        public static void Record(Clan? clan)
+        public static void Record(Clan? clan) => Record(clan?.StringId);
+
+        public static void Record(string? clanId)
         {
-            string? id = clan?.StringId;
-            if (id != null && !string.IsNullOrWhiteSpace(id))
+            if (!string.IsNullOrWhiteSpace(clanId))
             {
-                ClanIds.Add(id);
+                ClanIds.Add(clanId!);
             }
         }
 
-        public static bool Contains(Clan? clan)
+        public static bool Contains(Clan? clan) => Contains(clan?.StringId);
+
+        public static bool Contains(string? clanId)
         {
-            string? id = clan?.StringId;
-            return id != null && !string.IsNullOrWhiteSpace(id) && ClanIds.Contains(id);
+            return !string.IsNullOrWhiteSpace(clanId) && ClanIds.Contains(clanId!);
+        }
+
+        // On a dedicated server, MobileParty.MainParty.ActualClan is always null (Coop removes the
+        // server's main party at boot), so ImprovedSettlement.CheckIfNPCGarrison's vanilla single-player
+        // comparison against it is meaningless there. A settlement is treated as player-owned instead
+        // when its owner clan is one Improved Garrisons has already recorded as a connected player's clan.
+        public static bool IsNpcGarrison(string? ownerClanId)
+        {
+            return string.IsNullOrWhiteSpace(ownerClanId) || !Contains(ownerClanId);
         }
     }
 }
