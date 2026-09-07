@@ -164,6 +164,17 @@ namespace ImprovedGarrisons.CoopIntegration.Patching
             return false;
         }
 
+        public static bool ServerCheckIfNpcGarrisonPrefix(ImprovedSettlement __instance, ref bool __result)
+        {
+            if (!IntegrationRuntime.IsServer)
+            {
+                return true;
+            }
+
+            __result = ServerClanRegistry.IsNpcGarrison(__instance.Settlement?.OwnerClan?.StringId);
+            return false;
+        }
+
         public static bool ForwardSettingPrefix(MethodBase __originalMethod, object[] __args)
         {
             if (!IsClient())
@@ -700,6 +711,7 @@ namespace ImprovedGarrisons.CoopIntegration.Patching
             Patch(harmony, "ImprovedGarrisons.ImprovedGarrisonsUI.UIManager", "TryInitializeImprovedGarrisonsUI", nameof(SkipOnServerFalsePrefix), null, ref applied, ref failed);
             Patch(harmony, typeof(GarrisonBehavior), "OnGameOpen", nameof(ServerOnGameOpenPrefix), null, ref applied, ref failed);
             Patch(harmony, typeof(GarrisonBehavior), "GetTownSettings", nameof(ServerTownSettingsPrefix), null, ref applied, ref failed);
+            Patch(harmony, typeof(ImprovedSettlement), "CheckIfNPCGarrison", nameof(ServerCheckIfNpcGarrisonPrefix), null, ref applied, ref failed);
             Patch(harmony, "ImprovedGarrisons.Main", "OpenConfigurationScreen", nameof(BlockConfigScreenPrefix), null, ref applied, ref failed);
         }
 

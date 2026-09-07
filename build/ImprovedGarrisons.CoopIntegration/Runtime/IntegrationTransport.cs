@@ -484,6 +484,13 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
             _configAttempts = 0;
             _configReceived = false;
             _nextConfigRequest = 0;
+
+            // A disconnect can mean the underlying server process restarted (Poll() detects the new
+            // broker/network and calls Teardown() before re-subscribing). The next server's own revision
+            // counters start low again, so any watermark carried over from before this disconnect must be
+            // forgotten here, not just the transport's own connection-tracking fields above.
+            PartyManifestStore.ResetClientState();
+            SettingsStateStore.ResetClientState();
         }
 
         private static void ShowLocal(string text, uint color)

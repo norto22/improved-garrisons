@@ -34,6 +34,17 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
             _nextPoll = 0;
         }
 
+        // Called from IntegrationTransport.Teardown() on every disconnect (including a reconnect to a
+        // server that just restarted). Without this, _remoteRevision keeps its pre-restart value, and
+        // the freshly-restarted server's own low revision numbers are permanently rejected by the
+        // ApplyRemote guard below.
+        internal static void ResetClientState()
+        {
+            _remoteRevision = 0;
+            _remoteEntries = null;
+            _clientUnresolved = false;
+        }
+
         public static void Poll()
         {
             int now = Environment.TickCount;

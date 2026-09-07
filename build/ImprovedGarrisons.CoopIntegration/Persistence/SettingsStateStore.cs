@@ -26,6 +26,15 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
 
         public static long Revision { get; private set; }
 
+        // Called from IntegrationTransport.Teardown() on every disconnect (including a reconnect to a
+        // server that just restarted). Without this, _remoteRevision keeps its pre-restart value, and
+        // the freshly-restarted server's own low revision numbers are permanently rejected by the
+        // ApplyConfigXml/ApplyState guards below.
+        internal static void ResetClientState()
+        {
+            _remoteRevision = 0;
+        }
+
         public static string ReadConfigXml()
         {
             try
