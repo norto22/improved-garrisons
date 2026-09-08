@@ -1,5 +1,8 @@
 using System;
 using Common;
+using Coop.Core.Server;
+using Coop.Core.Server.States;
+using GameInterface;
 using ImprovedGarrisons.CoopIntegration.Patching;
 using ImprovedGarrisons.CoopIntegration.Persistence;
 
@@ -16,6 +19,10 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
         public static bool CoopActive => IntegrationTransport.IsConnected;
 
         public static bool NativePartyRegistrationReady => CoopMobilePartyRegistration.IsReady;
+
+        internal static bool ServerCampaignReady => IsServer
+            && ContainerProvider.TryResolve(out IServerLogic server)
+            && server.State is ServerRunningState;
 
         public static bool IsServer
         {

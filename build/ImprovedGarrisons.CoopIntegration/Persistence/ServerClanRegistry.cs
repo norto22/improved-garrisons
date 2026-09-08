@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using GameInterface;
+using GameInterface.Services.ObjectManager;
+using GameInterface.Services.Players;
+using GameInterface.Services.Players.Data;
 using TaleWorlds.CampaignSystem;
 
 namespace ImprovedGarrisons.CoopIntegration.Persistence
@@ -7,6 +11,25 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
     internal static class ServerClanRegistry
     {
         private static readonly HashSet<string> ClanIds = new HashSet<string>(StringComparer.Ordinal);
+
+        internal static void RestorePlayers()
+        {
+            if (!ContainerProvider.TryResolve(out IPlayerManager players)
+                || !ContainerProvider.TryResolve(out IObjectManager objects)
+                || players.Players == null)
+            {
+                return;
+            }
+
+            foreach (Player player in players.Players)
+            {
+                if (!string.IsNullOrWhiteSpace(player.ClanId)
+                    && objects.TryGetObject(player.ClanId, out Clan clan))
+                {
+                    Record(clan);
+                }
+            }
+        }
 
         public static void Record(Clan? clan) => Record(clan?.StringId);
 

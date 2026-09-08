@@ -164,6 +164,41 @@ namespace ImprovedGarrisons.CoopIntegration.Patching
             return false;
         }
 
+        public static bool InitializeSettlementsPrefix()
+        {
+            // The single-player load cleanup removes every other player's settings on a server.
+            // Coop restores server settings after campaign loading; clients adopt scoped StateSync.
+            return !IntegrationRuntime.IsServer && !IsClient();
+        }
+
+        public static bool SettlementOwnerChangedPrefix(GarrisonBehavior __instance, Settlement settlement, Hero y, Hero z)
+        {
+            if (IsClient())
+            {
+                return false;
+            }
+
+            if (!IntegrationRuntime.IsServer)
+            {
+                return true;
+            }
+
+            // Ownership refreshes and a new leader in the same clan retain the clan's configuration.
+            // Only an actual transfer between clans discards the previous owner's settings.
+            if (settlement?.Town != null && y?.Clan != null && z?.Clan != null && y.Clan != z.Clan)
+            {
+                __instance.SettlementSettingsData.Remove(settlement.Town.Name.ToString());
+                if (ServerClanRegistry.Contains(settlement.OwnerClan))
+                {
+                    __instance.GetTownSettings(settlement.Town);
+                }
+
+                SettingsStateStore.MarkDirty();
+            }
+
+            return false;
+        }
+
         public static bool ServerCheckIfNpcGarrisonPrefix(ImprovedSettlement __instance, ref bool __result)
         {
             if (!IntegrationRuntime.IsServer)
@@ -711,6 +746,8 @@ namespace ImprovedGarrisons.CoopIntegration.Patching
             Patch(harmony, "ImprovedGarrisons.ImprovedGarrisonsUI.UIManager", "TryInitializeImprovedGarrisonsUI", nameof(SkipOnServerFalsePrefix), null, ref applied, ref failed);
             Patch(harmony, typeof(GarrisonBehavior), "OnGameOpen", nameof(ServerOnGameOpenPrefix), null, ref applied, ref failed);
             Patch(harmony, typeof(GarrisonBehavior), "GetTownSettings", nameof(ServerTownSettingsPrefix), null, ref applied, ref failed);
+            Patch(harmony, typeof(GarrisonBehavior), "InitializeSettlements", nameof(InitializeSettlementsPrefix), null, ref applied, ref failed);
+            Patch(harmony, typeof(GarrisonBehavior), "onSettlementOwnerChanged", nameof(SettlementOwnerChangedPrefix), null, ref applied, ref failed);
             Patch(harmony, typeof(ImprovedSettlement), "CheckIfNPCGarrison", nameof(ServerCheckIfNpcGarrisonPrefix), null, ref applied, ref failed);
             Patch(harmony, "ImprovedGarrisons.Main", "OpenConfigurationScreen", nameof(BlockConfigScreenPrefix), null, ref applied, ref failed);
         }

@@ -77,6 +77,11 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
                 return Reject(request, "not_ready", "IG: Improved Garrisons is not initialized on the server.");
             }
 
+            if (!SettingsStateStore.EnsureServerRestored())
+            {
+                return Reject(request, "not_ready", "IG: settlement settings are still loading on the server.");
+            }
+
             Settlement? settlement = MBObjectManager.Instance?.GetObject<Settlement>(request.SettlementId);
             Town? town = settlement?.Town;
             if (settlement == null || town == null)

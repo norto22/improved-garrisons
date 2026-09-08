@@ -324,6 +324,11 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
 
             GameThread.RunSafe(() =>
             {
+                if (!SettingsStateStore.EnsureServerRestored())
+                {
+                    return;
+                }
+
                 string peerClanId = ServerActionDispatcher.ResolvePeerClanId(peer);
                 network.SendImmediate(peer, new ConfigSync { ConfigXml = SettingsStateStore.ReadConfigXml(), Revision = SettingsStateStore.Revision });
                 network.SendImmediate(peer, new StateSync

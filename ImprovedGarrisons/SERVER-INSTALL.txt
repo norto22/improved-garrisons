@@ -1,4 +1,4 @@
-Improved Garrisons v1.1.5 - BannerlordCoop dedicated server
+Improved Garrisons v1.1.7 - BannerlordCoop dedicated server
 =============================================================
 
 This package is one custom Bannerlord module.
@@ -24,9 +24,17 @@ Prerequisites
 -------------
 
   - A working BannerlordCoop dedicated server, already installed and able to
-    boot on its own before you add this module. This release is built and
-    tested against game v1.4.8 and BannerlordCoop build v0.1.4+6df9901; other
-    versions are unverified.
+    boot on its own before you add this module. This release targets game
+    v1.4.8. Automated runtime contracts were checked against BannerlordCoop
+    v0.1.5 and its dedicated-server build 2026-09-06 (paired Coop commit
+    4ad976c8); an in-game smoke test is still required.
+  - The complete dedicated-server package paired with that Coop build.
+    The appliance verifies the SHA-256 hashes of its Coop assemblies at
+    startup and before listening. Replacing only engine/Modules/Coop with a
+    different client build can stop startup with exit code 4. Update the
+    appliance as a matched package and use the matching Coop build on clients.
+    IG's manifest patch belongs in DedicatedServer.Windows; leave the
+    appliance's engine/Modules/Coop files unchanged.
   - File access to that dedicated server's own install root -- the folder
     that directly contains its "engine/" subfolder (this is BannerlordCoop's
     own dedicated-server layout, the same regardless of whether you deployed
@@ -43,7 +51,8 @@ Prerequisites
 Install
 -------
 
-1. Stop the dedicated server and back up the current campaign save.
+1. Stop the dedicated server and back up its persistent data directory,
+   including the campaign save, paired session JSON, IG settings and backups.
 2. Copy this complete folder to:
 
      engine/Modules/ImprovedGarrisons
@@ -56,12 +65,13 @@ Install
    already creates these links for you, create them yourself, for example
    on a Linux/Wine host:
 
-     ln -sf <path-to>/ImprovedGarrisons/bin/Win64_Shipping_Client/ImprovedGarrisons.CoopBootstrap.dll \
+     ln -sf ../../../ImprovedGarrisons/bin/Win64_Shipping_Client/ImprovedGarrisons.CoopBootstrap.dll \
        engine/Modules/DedicatedServer.Windows/bin/Win64_Shipping_Client/ImprovedGarrisons.CoopBootstrap.dll
-     ln -sf <path-to>/ImprovedGarrisons/bin/Win64_Shipping_Server/ImprovedGarrisons.CoopBootstrap.dll \
+     ln -sf ../../../ImprovedGarrisons/bin/Win64_Shipping_Server/ImprovedGarrisons.CoopBootstrap.dll \
        engine/Modules/DedicatedServer.Windows/bin/Win64_Shipping_Server/ImprovedGarrisons.CoopBootstrap.dll
 
-   On a native Windows host, use `mklink` to the same effect.
+   These link targets are relative to each link's directory. Run the commands
+   from the appliance install root. On Windows, use `mklink` to the same effect.
 4. Back up engine/Modules/DedicatedServer.Windows/SubModule.xml, then replace
    it with the content of:
 
@@ -95,9 +105,41 @@ server will boot with Improved Garrisons never running again -- with no error,
 just total silence from every Improved Garrisons action. There is currently no
 way to make this self-healing from inside this module or this repository (it
 would require editing the appliance's own startup script, which is outside
-this module's control and resets on update the same way). Re-run step 4 after
-every BannerlordCoop/appliance update, and check the Verification section
-above afterward.
+this module's control and resets on update the same way). Re-run steps 3-4
+after every BannerlordCoop/appliance update: replacing the appliance can
+remove the bootstrap links as well as the manifest patch. Check the
+Verification section above afterward.
+
+Coop v0.1.5 configuration and saves
+----------------------------------
+
+Use the data directory printed in the appliance's boot banner. By default:
+
+  Documents/Mount and Blade II Bannerlord/CoopData/DedicatedServer
+
+The launcher accepts --data-dir <path> to select another directory. Keep it
+outside the replaceable appliance install folder and retain the same path
+when updating. With a container or Wine host, persist the actual directory
+used by that process, not a different host user's Documents folder.
+
+Server settings live in <data dir>/server-config.json: saveName,
+autosaveMinutes (0 disables autosaving), password, logFile, and steam.
+Edit the file and restart the server. If saveName does not identify an
+existing save, Coop creates a new world from default_new_game.sav, so retain
+the previous saveName when upgrading an existing campaign.
+
+Campaign saves and paired session JSON live in <data dir>/Game Saves.
+Coop retains two backup generations, .backup1 and .backup2, with their paired
+session JSON. Back up and restore each save together with its matching JSON.
+
+Coop gameplay settings are separate: mod-config.json defaults to the shared
+CoopData directory one level above DedicatedServer. COOP_DATA_DIR overrides
+that shared config directory; BANNERLORD_USER_DIR identifies the dedicated
+save directory used by IG. If COOP_DATA_DIR is unset, Coop's config resolver
+can fall back to BANNERLORD_USER_DIR, putting mod-config.json beside the server
+data instead. Check the startup paths when a hosting script sets these values.
+Refer to the matched appliance's release-info.txt for its startup settings,
+networking, and exact paired build.
 
 Persistent Coop data
 --------------------
@@ -115,6 +157,19 @@ known IG state/backup files are copied from the legacy
 DedicatedServer/server-data/improved-garrisons folder when no persistent copy
 already exists. No Coop save or player-registration JSON file is migrated or
 modified.
+
+Settings restore after BannerlordCoop finishes loading the campaign and saved
+players, before IG accepts settings changes or sends the initial settings sync.
+Saved players' clans remain recognized even while those players are offline.
+Coop ownership refreshes retain settings; a transfer to another clan clears the
+previous owner's settings. Ordinary mod updates do not reset these files.
+
+Changed settings are written atomically and failed writes are retried. The
+settlement-settings.txt.bak file retains the previous settings change; routine
+activity updates do not replace that backup. If restoration fails, IG logs the
+failure and leaves the file intact instead of overwriting it with defaults.
+Keep the data directory and its backups when updating either module. A file
+already deleted by an earlier install/update cannot be reconstructed by IG.
 
 Client install
 --------------

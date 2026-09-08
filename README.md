@@ -26,7 +26,9 @@ Install a working BannerlordCoop dedicated server first, then follow
 [`ImprovedGarrisons/SERVER-INSTALL.txt`](ImprovedGarrisons/SERVER-INSTALL.txt)
 in the downloaded module — it covers the extra manifest patch a Coop
 dedicated server needs to actually activate this module, verification steps,
-and what to redo after a Coop update.
+and what to redo after a Coop update. The guide covers Coop v0.1.5's paired
+server/client builds, persistent save directory, shared gameplay configuration,
+and preserving IG settings during updates.
 
 ## Garrison templates and surplus guards
 

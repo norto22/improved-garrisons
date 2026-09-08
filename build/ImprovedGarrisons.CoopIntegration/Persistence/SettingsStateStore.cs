@@ -15,13 +15,14 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
 {
     internal static class SettingsStateStore
     {
-        private static readonly string SettingsPath = IntegrationDataPaths.FilePath("settlement-settings.txt");
+        private static string SettingsPath => IntegrationDataPaths.FilePath("settlement-settings.txt");
         private static readonly PropertyInfo[] PrimitiveProperties = BuildPrimitiveProperties();
         private static readonly Dictionary<string, PropertyInfo> PropertiesByName = BuildPropertyMap();
-        private static bool _restored;
+        private static Dictionary<string, GarrisonSettings>? _restoredSettings;
         private static bool _force = true;
         private static string _lastState = string.Empty;
         private static string _lastConfig = string.Empty;
+        private static string? _lastPersistedSettings;
         private static long _remoteRevision;
 
         public static long Revision { get; private set; }
@@ -109,12 +110,13 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                 }
 
                 Dictionary<string, int>? troops = value.Template?.GetTroopList();
+                builder.Append("Template=");
                 if (troops == null || troops.Count == 0)
                 {
+                    builder.AppendLine();
                     continue;
                 }
 
-                builder.Append("Template=");
                 bool first = true;
                 foreach (KeyValuePair<string, int> troop in troops)
                 {
@@ -268,17 +270,36 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
             PartyManifestStore.RequestImmediatePoll();
         }
 
-        internal static void PollServer()
+        internal static bool EnsureServerRestored()
         {
-            if (!IntegrationRuntime.IsServer || global::ImprovedGarrisons.Main.GarrisonBehavior == null)
+            if (!IntegrationRuntime.ServerCampaignReady || global::ImprovedGarrisons.Main.GarrisonBehavior == null)
             {
-                return;
+                return false;
             }
 
-            if (!_restored)
+            Dictionary<string, GarrisonSettings> settings = global::ImprovedGarrisons.Main.GarrisonBehavior.SettlementSettingsData;
+            if (!ReferenceEquals(_restoredSettings, settings))
             {
-                _restored = true;
-                RestoreSettings();
+                // A session load can replace IGSaveData after the transport first connects.
+                // Restore only after Coop finishes loading, and repeat for a replacement save object.
+                if (!RestoreSettings())
+                {
+                    return false;
+                }
+
+                ServerClanRegistry.RestorePlayers();
+                _restoredSettings = settings;
+                _force = true;
+            }
+
+            return true;
+        }
+
+        internal static void PollServer()
+        {
+            if (!EnsureServerRestored())
+            {
+                return;
             }
 
             string settings = BuildSettingsText();
@@ -290,33 +311,60 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                 return;
             }
 
-            _force = false;
-            _lastState = stateKey;
-            _lastConfig = config;
-            Revision++;
             try
             {
-                IntegrationDataPaths.WriteAtomic(SettingsPath, settings);
+                // Activity counters also change the network revision. They must not continually
+                // replace the settings backup with another copy of the same settings.
+                if (settings != _lastPersistedSettings)
+                {
+                    if (string.IsNullOrEmpty(SettingsPath))
+                    {
+                        IntegrationLog.Error("settings persist failed: no writable data directory");
+                        return;
+                    }
+
+                    IntegrationDataPaths.WriteAtomic(SettingsPath, settings);
+                    _lastPersistedSettings = settings;
+                }
             }
             catch (IOException exception)
             {
                 IntegrationLog.Error("settings persist failed: " + exception.Message);
+                return;
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                IntegrationLog.Error("settings persist denied: " + exception.Message);
+                return;
             }
 
+            _force = false;
+            _lastState = stateKey;
+            _lastConfig = config;
+            Revision++;
             IntegrationTransport.BroadcastState(activity, Revision);
         }
 
-        private static void RestoreSettings()
+        private static bool RestoreSettings()
         {
-            if (string.IsNullOrEmpty(SettingsPath) || !File.Exists(SettingsPath))
+            if (string.IsNullOrEmpty(SettingsPath))
             {
-                return;
+                return false;
+            }
+
+            if (!File.Exists(SettingsPath))
+            {
+                _lastPersistedSettings = null;
+                return true;
             }
 
             try
             {
-                ApplySettingsText(File.ReadAllText(SettingsPath));
+                string persisted = File.ReadAllText(SettingsPath);
+                ApplySettingsText(persisted);
+                _lastPersistedSettings = persisted;
                 IntegrationLog.Information("restored persisted settlement settings");
+                return true;
             }
             catch (IOException exception)
             {
@@ -326,17 +374,25 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
             {
                 IntegrationLog.Error("settings restore rejected: " + exception.Message);
             }
+            catch (UnauthorizedAccessException exception)
+            {
+                IntegrationLog.Error("settings restore denied: " + exception.Message);
+            }
+
+            return false;
         }
 
         private static void ApplySettingsText(string text, bool pruneAbsentKeys = false)
         {
             Dictionary<string, GarrisonSettings>? allSettings = global::ImprovedGarrisons.Main.GarrisonBehavior?.SettlementSettingsData;
-            if (allSettings == null || string.IsNullOrEmpty(text))
+            if (allSettings == null)
             {
                 return;
             }
 
-            HashSet<string>? incomingKeys = pruneAbsentKeys ? new HashSet<string>(StringComparer.Ordinal) : null;
+            // Parse the complete snapshot before touching live settings. A malformed save must
+            // neither partially reset the campaign nor be persisted over its recoverable source.
+            Dictionary<string, GarrisonSettings> incoming = new Dictionary<string, GarrisonSettings>(StringComparer.Ordinal);
             GarrisonSettings? current = null;
             foreach (string rawLine in text.Split('\n'))
             {
@@ -349,37 +405,38 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                 if (line[0] == '[' && line[line.Length - 1] == ']')
                 {
                     string key = Decode(line.Substring(1, line.Length - 2));
-                    incomingKeys?.Add(key);
-                    if (!allSettings.TryGetValue(key, out current) || current == null || current is NPCGarrisonSettings)
+                    if (string.IsNullOrWhiteSpace(key))
                     {
-                        current = new GarrisonSettings();
-                        allSettings[key] = current;
+                        throw new FormatException("A settlement identifier is empty.");
                     }
-
-                    // Legacy snapshots omit this opt-in field, including when reusing an existing object.
-                    current.GuardsAutoSpawnFromExcess = false;
+                    current = new GarrisonSettings();
+                    incoming[key] = current;
                     continue;
                 }
 
                 if (current == null)
                 {
-                    continue;
+                    throw new FormatException("A setting has no settlement header.");
                 }
 
                 int separator = line.IndexOf('=');
                 if (separator <= 0)
                 {
-                    continue;
+                    throw new FormatException("A setting record is incomplete.");
                 }
 
                 string name = line.Substring(0, separator);
                 string value = line.Substring(separator + 1);
                 if (name == "TroopsToUpgradeTo")
                 {
-                    string[] fields = value.Split(',');
+                    string[] fields = value.Length == 0 ? Array.Empty<string>() : value.Split(',');
                     bool[] paths = new bool[fields.Length];
                     for (int index = 0; index < fields.Length; index++)
                     {
+                        if (fields[index] != "0" && fields[index] != "1")
+                        {
+                            throw new FormatException("An upgrade path is invalid.");
+                        }
                         paths[index] = fields[index] == "1";
                     }
 
@@ -395,12 +452,39 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                 }
             }
 
-            if (incomingKeys != null)
+            foreach (KeyValuePair<string, GarrisonSettings> entry in incoming)
+            {
+                if (allSettings.TryGetValue(entry.Key, out GarrisonSettings existing)
+                    && existing != null && !(existing is NPCGarrisonSettings))
+                {
+                    // Preserve the settings object referenced by the open UI.
+                    foreach (PropertyInfo property in PrimitiveProperties)
+                    {
+                        property.SetValue(existing, property.GetValue(entry.Value, null), null);
+                    }
+
+                    existing.TroopsToUpgradeTo = entry.Value.TroopsToUpgradeTo;
+                    if (existing.Template == null)
+                    {
+                        existing.Template = entry.Value.Template;
+                    }
+                    else
+                    {
+                        existing.Template.SetTroops(entry.Value.Template.GetTroopList());
+                    }
+                }
+                else
+                {
+                    allSettings[entry.Key] = entry.Value;
+                }
+            }
+
+            if (pruneAbsentKeys)
             {
                 List<string> staleKeys = new List<string>();
                 foreach (KeyValuePair<string, GarrisonSettings> entry in allSettings)
                 {
-                    if (entry.Value is NPCGarrisonSettings || incomingKeys.Contains(entry.Key))
+                    if (entry.Value is NPCGarrisonSettings || incoming.ContainsKey(entry.Key))
                     {
                         continue;
                     }
@@ -420,17 +504,25 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
             Dictionary<string, int> troops = new Dictionary<string, int>(StringComparer.Ordinal);
             foreach (string entry in value.Split(';'))
             {
-                int separator = entry.LastIndexOf(':');
-                if (separator <= 0 || !int.TryParse(entry.Substring(separator + 1), NumberStyles.Integer, CultureInfo.InvariantCulture, out int count))
+                if (value.Length == 0)
                 {
-                    continue;
+                    break;
+                }
+
+                int separator = entry.LastIndexOf(':');
+                if (separator <= 0 || !int.TryParse(entry.Substring(separator + 1), NumberStyles.Integer, CultureInfo.InvariantCulture, out int count)
+                    || count < 0)
+                {
+                    throw new FormatException("A template target is invalid.");
                 }
 
                 string id = Decode(entry.Substring(0, separator));
-                if (!string.IsNullOrWhiteSpace(id) && count > 0)
+                if (string.IsNullOrWhiteSpace(id))
                 {
-                    troops[id] = Math.Min(count, 10_000);
+                    throw new FormatException("A template troop identifier is empty.");
                 }
+
+                troops[id] = Math.Min(count, 10_000);
             }
 
             settings.Template?.SetTroops(troops);
@@ -460,13 +552,13 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
 
                 property.SetValue(settings, parsed, null);
             }
-            catch (FormatException)
+            catch (FormatException exception)
             {
-                // A malformed property is ignored without discarding the rest of the state snapshot.
+                throw new FormatException("Invalid setting " + property.Name + ".", exception);
             }
-            catch (OverflowException)
+            catch (OverflowException exception)
             {
-                // A malformed property is ignored without discarding the rest of the state snapshot.
+                throw new FormatException("Invalid setting " + property.Name + ".", exception);
             }
         }
 
