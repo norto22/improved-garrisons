@@ -376,7 +376,9 @@ namespace ImprovedGarrisons.SaveSystem.SaveData.DataManipulationManager
 				}
 				else
 				{
-					InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=info_template_removedtargets1}The garrison of").ToString() + ModuleStrings._space + base.garrisonBehavior.CurrentTownForSettings.Name?.ToString() + new TextObject("{=info_template_removedtargets1}The garrison of").ToString(), Color.FromUint(ModuleColors.yellow)));
+					TextObject message = new TextObject("{=info_template_cleared}Training template cleared for {SETTLEMENT}.");
+					message.SetTextVariable("SETTLEMENT", _currentTown.Name);
+					InformationManager.DisplayMessage(new InformationMessage(message.ToString(), Color.FromUint(ModuleColors.yellow)));
 				}
 				if (_trainingDataSource != null)
 				{
@@ -432,7 +434,7 @@ namespace ImprovedGarrisons.SaveSystem.SaveData.DataManipulationManager
 				}
 				Main.PartyManagement.PromptManagementScreenWithActions(mobileParty.Party, mobileParty2, delegate(TroopRoster leftMemberRoster, TroopRoster rightMemberRoster)
 				{
-					if (leftMemberRoster != null && leftMemberRoster.Count > 0)
+					if (leftMemberRoster != null)
 					{
 						List<TroopRosterElement> list3 = new List<TroopRosterElement>();
 						foreach (TroopRosterElement item4 in leftMemberRoster.GetTroopRoster())

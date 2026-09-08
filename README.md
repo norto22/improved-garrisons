@@ -32,8 +32,10 @@ and what to redo after a Coop update.
 
 The Template page shows **Actual garrison** (stationed troops, wounded counts,
 and current troops / capacity) separately from **Template targets** (the desired
-composition). **Add troops** edits those targets; it does not add or remove real
-soldiers.
+composition). **Edit template troops** changes those targets; it does not add or
+remove real soldiers. Choose **Done** to save, including an empty template, or
+**Cancel** to keep the previous targets. Removed types stay out of the targets
+when reopening the editor, but remain available in its troop-selection list.
 
 Under Guard Parties, **Auto-create guards from surplus troops** is off by default.
 When enabled, it creates a guard using the configured **Automatic guard creation
@@ -49,6 +51,11 @@ ordinary total-garrison creation threshold, and takes priority over ordinary
 automatic patrol selection. Guard replenishment also respects template needs
 while this option is enabled; the separate village-defense setting remains
 independent.
+
+The Guard Parties header shows surplus-guard readiness, including eligible troops
+against the required party size and the current reason for waiting. It updates
+as troops and settings change, and identifies an active guard, a settlement under
+attack, a missing template or garrison, or a batch ready for the next hourly check.
 
 | Surplus guards | Automatic removal | Unneeded troops |
 |---|---|---|

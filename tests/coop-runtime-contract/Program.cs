@@ -35,6 +35,7 @@ public static partial class ContractRunner
         try
         {
             GameThread.Instance.MarkGameThread();
+            RunTemplateEditorReadinessTests();
             RunGarrisonDisplayTests();
             RunTemplateSurplusTests();
             RunSurplusGuardSettingsTests();

@@ -42,6 +42,8 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
 
         public ImprovedGarrisonsOptionVM ToggleAutoGuardCreation { get; set; }
 
+        public SurplusGuardReadinessVM SurplusReadiness { get; } = new SurplusGuardReadinessVM();
+
         public string GuardInfoText { get; } = new TextObject("{=ui_guardsui_infotitle}Guard party information").ToString();
 
         public string CreateGuardText { get; } = new TextObject("{=ui_guardsui_createguard}Create a new guard party").ToString();
@@ -191,6 +193,9 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
         public override void RefreshValues()
         {
             base.RefreshValues();
+            Town town = Main.GarrisonBehavior.CurrentTownForSettings;
+            SurplusReadiness.Refresh(town?.GarrisonParty?.MemberRoster, CurrentGarrisonSettings, CurrentMobileGarrison != null,
+                town?.Settlement != null && (town.Settlement.IsUnderSiege || town.Settlement.IsUnderRaid));
             HasNoActiveGuard = CurrentMobileGarrison == null;
             GuardStatus = ((CurrentMobileGarrison != null) ? CurrentMobileGarrison.GetStatusText() : new TextObject("{=ui_guardsui_noguards}There is no active guard party").ToString());
             foreach (ImprovedGarrisonsInformationListVM item in GuardInformation)
