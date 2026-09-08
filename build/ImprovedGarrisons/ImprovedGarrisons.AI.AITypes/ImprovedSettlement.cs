@@ -196,7 +196,7 @@ namespace ImprovedGarrisons.AI.AITypes
 				MobileGarrison mobileGarrisonPartyOfSettlement = Main.PartyManagement.mobileGarrisonManagement.GetMobileGarrisonPartyOfSettlement(Settlement);
 				bool flag = Settlement != null;
 				bool guardsAutoSpawn = homeGarrisonSettings.GuardsAutoSpawn;
-				if (mobileGarrisonPartyOfSettlement != null && flag && mobileGarrisonPartyOfSettlement.CurrentOrder is OrderPatrol && mobileGarrisonPartyOfSettlement.isNPC && (Settlement.Town.GarrisonParty == null || !guardsAutoSpawn))
+				if (mobileGarrisonPartyOfSettlement != null && flag && mobileGarrisonPartyOfSettlement.CurrentOrder is OrderPatrol && mobileGarrisonPartyOfSettlement.isNPC && CheckIfNPCGarrison() && (Settlement.Town.GarrisonParty == null || (!guardsAutoSpawn && !homeGarrisonSettings.GuardsAutoSpawnFromExcess)))
 				{
 					mobileGarrisonPartyOfSettlement.SetReturnMode();
 				}
@@ -211,6 +211,11 @@ namespace ImprovedGarrisons.AI.AITypes
 		{
 			try
 			{
+				if (homeGarrisonSettings.GuardsAutoSpawnFromExcess)
+				{
+					Main.PartyManagement.mobileGarrisonManagement.CreateMobileGarrisonFromExcess(Settlement);
+					return;
+				}
 				MobileGarrison mobileGarrisonPartyOfSettlement = Main.PartyManagement.mobileGarrisonManagement.GetMobileGarrisonPartyOfSettlement(Settlement);
 				bool flag = Settlement?.Town.GarrisonParty != null;
 				bool guardsAutoSpawn = homeGarrisonSettings.GuardsAutoSpawn;
@@ -320,6 +325,11 @@ namespace ImprovedGarrisons.AI.AITypes
 		{
 			try
 			{
+				// Keep surplus troops available for guards, including while creation is blocked.
+				if (homeGarrisonSettings.GuardsAutoSpawnFromExcess)
+				{
+					return;
+				}
 				if (Settlement.Name.Contains("Jacul"))
 				{
 				}

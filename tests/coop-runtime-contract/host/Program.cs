@@ -9,7 +9,7 @@ if (args.Length != 2)
 
 string workerPath = Path.GetFullPath(args[0]);
 string repositoryRoot = Path.GetFullPath(args[1]);
-using CoopContractLoadContext context = new(workerPath, repositoryRoot);
+CoopContractLoadContext context = new(workerPath, repositoryRoot);
 Assembly worker = context.LoadFromAssemblyPath(workerPath);
 Type runner = worker.GetType("ImprovedGarrisons.CoopRuntimeContract.ContractRunner", throwOnError: true)!;
 MethodInfo run = runner.GetMethod("Run", BindingFlags.Public | BindingFlags.Static)
@@ -25,12 +25,13 @@ catch (TargetInvocationException exception) when (exception.InnerException != nu
     return 1;
 }
 
-internal sealed class CoopContractLoadContext : AssemblyLoadContext, IDisposable
+internal sealed class CoopContractLoadContext : AssemblyLoadContext
 {
     private readonly string[] searchDirectories;
 
     public CoopContractLoadContext(string workerPath, string repositoryRoot)
-        : base("ImprovedGarrisons.CoopRuntimeContract", isCollectible: true)
+        // Harmony emits non-collectible proxy assemblies; the test process owns this context's lifetime.
+        : base("ImprovedGarrisons.CoopRuntimeContract", isCollectible: false)
     {
         searchDirectories = new[]
         {
@@ -47,7 +48,8 @@ internal sealed class CoopContractLoadContext : AssemblyLoadContext, IDisposable
 
     protected override Assembly? Load(AssemblyName assemblyName)
     {
-        if (assemblyName.Name is "System.Private.CoreLib" or "System.Runtime" or "netstandard")
+        // Share core types and the Span facade with net8 instead of the game's older System.Memory.
+        if (assemblyName.Name is "System.Private.CoreLib" or "System.Runtime" or "netstandard" or "System.Memory")
         {
             return null;
         }
@@ -64,8 +66,4 @@ internal sealed class CoopContractLoadContext : AssemblyLoadContext, IDisposable
         return null;
     }
 
-    public void Dispose()
-    {
-        Unload();
-    }
 }

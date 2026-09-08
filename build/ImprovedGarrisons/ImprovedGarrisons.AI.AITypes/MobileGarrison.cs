@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ImprovedGarrisons.AI.AIManagers;
 using ImprovedGarrisons.AI.Orders.PartyOrder;
 using ImprovedGarrisons.Debugging.LogFileSystem;
 using ImprovedGarrisons.SaveSystem.SaveData.DataTypes;
@@ -124,14 +125,14 @@ namespace ImprovedGarrisons.AI.AITypes
 		{
 			try
 			{
-				if (base.ownerHero == null || base.ownerHero.PartyBelongedTo == null)
+				if (mobileParty == null || fromSettlement?.Town == null)
 				{
 					return;
 				}
 				GarrisonSettings townSettings = Main.GarrisonBehavior.GetTownSettings(fromSettlement.Town);
 				if (townSettings.InitialTroopRoster != null && !withReset)
 				{
-					InitialTroopRoster = new TroopRoster(base.ownerHero.PartyBelongedTo.Party);
+					InitialTroopRoster = new TroopRoster(mobileParty.Party);
 					foreach (Tuple<string, int> item in townSettings.InitialTroopRoster)
 					{
 						CharacterObject characterObject = MBObjectManager.Instance.GetObject<CharacterObject>(item.Item1);
@@ -143,7 +144,7 @@ namespace ImprovedGarrisons.AI.AITypes
 				}
 				else
 				{
-					InitialTroopRoster = Main.PartyManagement.CopyTroopRoster(mobileParty.MemberRoster, base.ownerHero.PartyBelongedTo.Party);
+					InitialTroopRoster = Main.PartyManagement.CopyTroopRoster(mobileParty.MemberRoster, mobileParty.Party);
 					if (InitialTroopRoster == null)
 					{
 						return;
@@ -154,14 +155,7 @@ namespace ImprovedGarrisons.AI.AITypes
 						townSettings.InitialTroopRoster.Add(new Tuple<string, int>(item2.Character.StringId, item2.Number));
 					}
 				}
-				if (InitialTroopRoster == null)
-				{
-					base.InitialSize = InitialTroopRoster.TotalManCount;
-				}
-				else
-				{
-					base.InitialSize = mobileParty.MemberRoster.TotalManCount;
-				}
+				base.InitialSize = mobileParty.MemberRoster.TotalManCount;
 			}
 			catch (Exception ex)
 			{
@@ -364,6 +358,9 @@ namespace ImprovedGarrisons.AI.AITypes
 					return null;
 				}
 				List<Tuple<CharacterObject, int>> list = new List<Tuple<CharacterObject, int>>();
+				Dictionary<CharacterObject, int> surplus = base.homeGarrisonSettings.GuardsAutoSpawnFromExcess
+					? TemplateSurplusTroops.GetSurplusTroops(fromSettlement.Town.GarrisonParty.MemberRoster, base.homeGarrisonSettings.Template?.GetTroopListAsCharacterObjects())
+					: null;
 				foreach (TroopRosterElement item in InitialTroopRoster.GetTroopRoster())
 				{
 					int num = fromSettlement.Town.GarrisonParty.MemberRoster.FindIndexOfTroop(item.Character);
@@ -376,6 +373,11 @@ namespace ImprovedGarrisons.AI.AITypes
 						if (num2 > 0 && num2 > troopCount3)
 						{
 							num2 = troopCount3;
+						}
+						if (surplus != null)
+						{
+							int available;
+							num2 = surplus.TryGetValue(item.Character, out available) ? Math.Min(num2, available) : 0;
 						}
 						if (num2 > 0)
 						{

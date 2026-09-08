@@ -66,6 +66,9 @@ namespace ImprovedGarrisons.SaveSystem.SaveData.DataTypes
 
 		public bool GuardsAutoSpawn { get; set; }
 
+		[field: OptionalField]
+		public bool GuardsAutoSpawnFromExcess { get; set; }
+
 		public bool GuardsAutoSpawnToDefend { get; set; }
 
 		public int GuardsAutoSpawnThreshold { get; set; }

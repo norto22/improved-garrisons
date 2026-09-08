@@ -42,6 +42,8 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
 
         public ImprovedGarrisonsOptionVM ToggleAutoGuardCreation { get; set; }
 
+        public SurplusGuardReadinessVM SurplusReadiness { get; } = new SurplusGuardReadinessVM();
+
         public string GuardInfoText { get; } = new TextObject("{=ui_guardsui_infotitle}Guard party information").ToString();
 
         public string CreateGuardText { get; } = new TextObject("{=ui_guardsui_createguard}Create a new guard party").ToString();
@@ -127,6 +129,10 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
         {
             GuardSettings = new MBBindingList<ImprovedGarrisonsOptionVM>();
             GuardSettings.Add(new ImprovedGarrisonsOptionVM().SetAsTitle(new TextObject("{=ui_guardsui_creationtitle}Smart guard creation settings").ToString()));
+            GuardSettings.Add(new ImprovedGarrisonsOptionVM().SetAsBooleanOption(new TextObject("{=ui_guardsui_surplusguards1}Auto-create guards from surplus troops").ToString(), delegate { return CurrentGarrisonSettings != null && CurrentGarrisonSettings.GuardsAutoSpawnFromExcess; }, delegate (bool x)
+            {
+                MobileGarrisonSettings.Instance.ToggleAutoGuardsFromExcess(Main.GarrisonBehavior.CurrentTownForSettings, x);
+            }, new TextObject("{=ui_guardsui_surplusguards2}Create guards from troops above template target counts and troop types outside the template. Recruits needed for template upgrades stay in the garrison. Requires a non-empty template and a full healthy batch of the configured guard party size; the normal creation threshold does not apply. Troops wait in the garrison while a guard party exists or a full batch is unavailable. Takes priority over automatic removal of non-template troops. Turning this off leaves existing guard parties unchanged.")));
             GuardSettings.Add(new ImprovedGarrisonsOptionVM().SetAsBooleanOption(new TextObject("{=ui_guardsui_autodefend1}Automatically create a guard party to defend villages").ToString(), delegate { return CurrentGarrisonSettings != null && CurrentGarrisonSettings.GuardsAutoSpawnToDefend; }, delegate (bool x)
             {
                 MobileGarrisonSettings.Instance.ToggleAutoGuardDefend(Main.GarrisonBehavior.CurrentTownForSettings, x);
@@ -187,6 +193,9 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
         public override void RefreshValues()
         {
             base.RefreshValues();
+            Town town = Main.GarrisonBehavior.CurrentTownForSettings;
+            SurplusReadiness.Refresh(town?.GarrisonParty?.MemberRoster, CurrentGarrisonSettings, CurrentMobileGarrison != null,
+                town?.Settlement != null && (town.Settlement.IsUnderSiege || town.Settlement.IsUnderRaid));
             HasNoActiveGuard = CurrentMobileGarrison == null;
             GuardStatus = ((CurrentMobileGarrison != null) ? CurrentMobileGarrison.GetStatusText() : new TextObject("{=ui_guardsui_noguards}There is no active guard party").ToString());
             foreach (ImprovedGarrisonsInformationListVM item in GuardInformation)

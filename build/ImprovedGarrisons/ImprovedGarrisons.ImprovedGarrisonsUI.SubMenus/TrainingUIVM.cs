@@ -21,21 +21,23 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
 
         public MBBindingList<ImprovedGarrisonsTroopItemWidgetVM> Troops { get; set; }
 
+        public ActualGarrisonVM ActualGarrison { get; } = new ActualGarrisonVM();
+
         public MBBindingList<ImprovedGarrisonsOptionVM> TrainingSettingsVM { get; set; }
 
         public bool TroopListIsDirty { get; set; } = true;
 
         public ImprovedGarrisonsOptionVM ToggleTraining { get; set; }
 
-        public string CurrentTemplateAddTroopText { get; } = new TextObject("{=ui_trainingui_addtroops}Add troops").ToString();
+        public string CurrentTemplateAddTroopText { get; } = new TextObject("{=ui_trainingui_edittemplatetroops}Edit template troops").ToString();
 
-        public string CurrentTemplateTitleText { get; } = new TextObject("{=ui_trainingui_currenttemplate}Current template").ToString();
+        public string CurrentTemplateTitleText { get; } = new TextObject("{=ui_trainingui_templatetargets}Template targets").ToString();
 
         public string TemplateManagerText { get; } = new TextObject("{=ui_trainingui_templatemanager}Template manager").ToString();
 
         public string TrainingSettingsText { get; } = new TextObject("{=ui_trainingui_trainingsettings}Training settings").ToString();
 
-        public HintViewModel AddTroopsButtonHint { get; } = new HintViewModel(new TextObject("{=ui_trainingui_addtroopshint}Add new troops to the training template.\n\nA training template is used to define the upgrade path this garrison will take when training troops. The troops you select here are not affected by the training tier restriction.\n\n Use a training template to compose your army as you want it. You can set the number of troops that should be trained for each upgrade target you define. You could, for example, define the number of infantry, ranged or cavalry troops your garrison should have."));
+        public HintViewModel AddTroopsButtonHint { get; } = new HintViewModel(new TextObject("{=ui_trainingui_edittemplatetroopshint}Edit the troop types and target counts in this garrison's training template.\n\nMove troops between the lists, then choose Done to save or Cancel to discard changes. An empty left list clears the template. These edits change training targets, not stationed troops."));
 
         public HintViewModel TemplateManagerButtonHint { get; } = new HintViewModel(new TextObject("{=ui_trainingui_templatemanagerhint}A training template is used to define the upgrade path this garrison will take when training troops. The troops you select here are not affected by the training tier restriction.\n \nUse a training template to compose your army as you want it. You can set the number of troops that should be trained for each upgrade target you define. You could, for example, define the number of infantry, ranged or cavalry troops your garrison should have.\n \nThe template manager is used to save, apply, inspect or remove your training templates. Your training templates are synchronized across your garrisons and game saves."));
 
@@ -67,6 +69,13 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
         {
             InitializeTrainingSettings();
             InitializeTroops();
+            RefreshActualGarrison();
+        }
+
+        private void RefreshActualGarrison()
+        {
+            var garrison = Main.GarrisonBehavior.CurrentTownForSettings?.GarrisonParty;
+            ActualGarrison.RefreshRoster(garrison?.MemberRoster, garrison?.Party.PartySizeLimit ?? 0);
         }
 
         private void InitializeTrainingSettings()
@@ -171,6 +180,7 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
         public override void RefreshValues()
         {
             base.RefreshValues();
+            RefreshActualGarrison();
             foreach (ImprovedGarrisonsOptionVM item in TrainingSettingsVM)
             {
                 item.RefreshValues();

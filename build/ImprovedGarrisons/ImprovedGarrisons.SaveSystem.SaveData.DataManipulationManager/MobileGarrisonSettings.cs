@@ -310,6 +310,21 @@ namespace ImprovedGarrisons.SaveSystem.SaveData.DataManipulationManager
 			}
 		}
 
+		public void ToggleAutoGuardsFromExcess(Town town, bool enable)
+		{
+			try
+			{
+				if (CheckIfTownIsValid(town))
+				{
+					base.garrisonBehavior.GetTownSettings(town).GuardsAutoSpawnFromExcess = enable;
+				}
+			}
+			catch (Exception ex)
+			{
+				LogFileManager.WriteErrorLogEntry(MethodBase.GetCurrentMethod().Name, ex);
+			}
+		}
+
 		public void ToggleAutoGuards(Town town, bool enable)
 		{
 			try

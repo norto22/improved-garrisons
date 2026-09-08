@@ -26,7 +26,7 @@ using LiteNetLib;
 
 namespace ImprovedGarrisons.CoopRuntimeContract;
 
-public static class ContractRunner
+public static partial class ContractRunner
 {
     private const string TestName = "test_shipped_integration_binds_to_real_coop_network_contract";
 
@@ -35,6 +35,10 @@ public static class ContractRunner
         try
         {
             GameThread.Instance.MarkGameThread();
+            RunTemplateEditorReadinessTests();
+            RunGarrisonDisplayTests();
+            RunTemplateSurplusTests();
+            RunSurplusGuardSettingsTests();
             TestPersistentDataUsesCoopDataDirectory();
             TestLegacyPersistenceMigrationIsScopedAndNonDestructive();
             TestBannerlordUserDirMigratesFromDocumentsPersistence();

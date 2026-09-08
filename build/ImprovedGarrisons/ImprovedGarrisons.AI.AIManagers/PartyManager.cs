@@ -566,6 +566,11 @@ namespace ImprovedGarrisons.AI.AIManagers
 
 		public void PromptManagementScreenWithActions(PartyBase leftParty, MobileParty rightParty, Action<TroopRoster, TroopRoster> doneAction, Action cancelAction)
 		{
+			PromptManagementScreenWithActions(leftParty, rightParty, doneAction, cancelAction, null);
+		}
+
+		public void PromptManagementScreenWithActions(PartyBase leftParty, MobileParty rightParty, Action<TroopRoster, TroopRoster> doneAction, Action cancelAction, int? leftPartyMembersSizeLimit)
+		{
 			try
 			{
 				if (leftParty != null && leftParty.MobileParty != null && rightParty != null && rightParty.Party != null && !(leftParty.Name == null))
@@ -581,7 +586,7 @@ namespace ImprovedGarrisons.AI.AIManagers
 						RightPrisonerRoster = rightParty.Party.PrisonRoster,
 						LeftOwnerParty = leftParty,
 						RightOwnerParty = rightParty.Party,
-						LeftPartyMembersSizeLimit = leftParty.PartySizeLimit,
+						LeftPartyMembersSizeLimit = leftPartyMembersSizeLimit ?? leftParty.PartySizeLimit,
 						RightPartyMembersSizeLimit = rightParty.Party.PartySizeLimit,
 						LeftPartyPrisonersSizeLimit = leftParty.PrisonerSizeLimit,
 						RightPartyPrisonersSizeLimit = rightParty.Party.PrisonerSizeLimit,

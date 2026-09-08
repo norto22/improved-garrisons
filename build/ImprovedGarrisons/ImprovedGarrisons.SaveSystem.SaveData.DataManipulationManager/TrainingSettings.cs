@@ -334,7 +334,7 @@ namespace ImprovedGarrisons.SaveSystem.SaveData.DataManipulationManager
 					}
 				}, delegate
 				{
-				});
+				}, town.GarrisonParty?.Party.PartySizeLimit);
 				InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=info_template_managetargets}In this screen, you can adjust the number of units this garrison should train. You may also remove troops from the list. \n \nOn the left side are the troops this garrison is training towards. On the right side is a copy of the same units that can be added to the left side.").ToString(), Color.FromUint(ModuleColors.modMainColor)));
 			}
 			catch (Exception ex2)
@@ -376,7 +376,9 @@ namespace ImprovedGarrisons.SaveSystem.SaveData.DataManipulationManager
 				}
 				else
 				{
-					InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=info_template_removedtargets1}The garrison of").ToString() + ModuleStrings._space + base.garrisonBehavior.CurrentTownForSettings.Name?.ToString() + new TextObject("{=info_template_removedtargets1}The garrison of").ToString(), Color.FromUint(ModuleColors.yellow)));
+					TextObject message = new TextObject("{=info_template_cleared}Training template cleared for {SETTLEMENT}.");
+					message.SetTextVariable("SETTLEMENT", _currentTown.Name);
+					InformationManager.DisplayMessage(new InformationMessage(message.ToString(), Color.FromUint(ModuleColors.yellow)));
 				}
 				if (_trainingDataSource != null)
 				{
@@ -432,7 +434,7 @@ namespace ImprovedGarrisons.SaveSystem.SaveData.DataManipulationManager
 				}
 				Main.PartyManagement.PromptManagementScreenWithActions(mobileParty.Party, mobileParty2, delegate(TroopRoster leftMemberRoster, TroopRoster rightMemberRoster)
 				{
-					if (leftMemberRoster != null && leftMemberRoster.Count > 0)
+					if (leftMemberRoster != null)
 					{
 						List<TroopRosterElement> list3 = new List<TroopRosterElement>();
 						foreach (TroopRosterElement item4 in leftMemberRoster.GetTroopRoster())
@@ -443,7 +445,7 @@ namespace ImprovedGarrisons.SaveSystem.SaveData.DataManipulationManager
 					}
 				}, delegate
 				{
-				});
+				}, _currentTown?.GarrisonParty?.Party.PartySizeLimit);
 				InformationManager.DisplayMessage(new InformationMessage(new TextObject("{=info_template_newtargets_desc}Move the troops that are to be trained by this garrison to the left side of the screen. \nMake sure to select the number you want to have trained. \n \nNote: Improved Garrison will always try to have this number of units in the garrison and will automatically train new units when this number is no longer reached.").ToString(), Color.FromUint(ModuleColors.modMainColor)));
 			}
 			catch (Exception ex)

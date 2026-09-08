@@ -719,7 +719,7 @@ namespace ImprovedGarrisons.CoopIntegration.Patching
         {
             Dictionary<Type, string[]> settings = new Dictionary<Type, string[]>
             {
-                [typeof(MobileGarrisonSettings)] = new[] { "SetReturnPercentage", "SetAutoGarrisonThreshold", "SetAutoGarrisonSize", "TogglePrisonerSell", "ToggleAutoGuards", "ToggleAutoGuardDefend", "TogglePrisonerRecruit", "ToggleUpgrade", "ToggleReplenish", "ToggleDestroyHideout", "ToggleHorseBuy" },
+                [typeof(MobileGarrisonSettings)] = new[] { "SetReturnPercentage", "SetAutoGarrisonThreshold", "SetAutoGarrisonSize", "TogglePrisonerSell", "ToggleAutoGuards", "ToggleAutoGuardsFromExcess", "ToggleAutoGuardDefend", "TogglePrisonerRecruit", "ToggleUpgrade", "ToggleReplenish", "ToggleDestroyHideout", "ToggleHorseBuy" },
                 [typeof(RecruitmentSettings)] = new[] { "SetRecruiterAmountToRecruit", "SetRecruitmentThreshold", "ToggleRecruitOnlyElite", "TogglePrisonerRecruitmentAboveThreshold", "TogglePrisonerRecruitment", "ToggleVanillaRecruitment", "ToggleRegionRecruitment", "ToggleRecruiterOnlyElites", "ToggleRecruiterBuyHorses", "TogglePrisonerRecruitmentIgnoresTemplate", "ToggleRecruiterAutoSpawn" },
                 [typeof(TrainingSettings)] = new[] { "SetTownMaxUpgradeTier", "ToggleVanillaTraining", "ToggleTraining", "ToggleAutoSpawn", "ToggleFollowTemplate", "ToggleRemoveNonTemplateTroops" }
             };
@@ -840,7 +840,7 @@ namespace ImprovedGarrisons.CoopIntegration.Patching
                 declaringType == typeof(RecruitmentSettings) ||
                 declaringType == typeof(TrainingSettings);
             return supportedType && Enum.TryParse(method.Name, false, out operation) &&
-                operation <= SettingsIntentKind.ToggleRemoveNonTemplateTroops;
+                (operation <= SettingsIntentKind.ToggleRemoveNonTemplateTroops || operation == SettingsIntentKind.ToggleAutoGuardsFromExcess);
         }
 
         private static bool IsClient()

@@ -245,7 +245,8 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
                 return;
             }
 
-            bool directSetting = intent.Operation <= SettingsIntentKind.ToggleRemoveNonTemplateTroops;
+            bool directSetting = intent.Operation <= SettingsIntentKind.ToggleRemoveNonTemplateTroops ||
+                intent.Operation == SettingsIntentKind.ToggleAutoGuardsFromExcess;
             DispatchIntent(new ServerAction
             {
                 OperationId = intent.OperationId,
