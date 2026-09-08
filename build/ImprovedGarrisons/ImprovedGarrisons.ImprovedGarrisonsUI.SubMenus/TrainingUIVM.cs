@@ -21,6 +21,8 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
 
         public MBBindingList<ImprovedGarrisonsTroopItemWidgetVM> Troops { get; set; }
 
+        public ActualGarrisonVM ActualGarrison { get; } = new ActualGarrisonVM();
+
         public MBBindingList<ImprovedGarrisonsOptionVM> TrainingSettingsVM { get; set; }
 
         public bool TroopListIsDirty { get; set; } = true;
@@ -29,7 +31,7 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
 
         public string CurrentTemplateAddTroopText { get; } = new TextObject("{=ui_trainingui_addtroops}Add troops").ToString();
 
-        public string CurrentTemplateTitleText { get; } = new TextObject("{=ui_trainingui_currenttemplate}Current template").ToString();
+        public string CurrentTemplateTitleText { get; } = new TextObject("{=ui_trainingui_templatetargets}Template targets").ToString();
 
         public string TemplateManagerText { get; } = new TextObject("{=ui_trainingui_templatemanager}Template manager").ToString();
 
@@ -67,6 +69,13 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
         {
             InitializeTrainingSettings();
             InitializeTroops();
+            RefreshActualGarrison();
+        }
+
+        private void RefreshActualGarrison()
+        {
+            var garrison = Main.GarrisonBehavior.CurrentTownForSettings?.GarrisonParty;
+            ActualGarrison.RefreshRoster(garrison?.MemberRoster, garrison?.Party.PartySizeLimit ?? 0);
         }
 
         private void InitializeTrainingSettings()
@@ -171,6 +180,7 @@ namespace ImprovedGarrisons.ImprovedGarrisonsUI.SubMenus
         public override void RefreshValues()
         {
             base.RefreshValues();
+            RefreshActualGarrison();
             foreach (ImprovedGarrisonsOptionVM item in TrainingSettingsVM)
             {
                 item.RefreshValues();

@@ -28,6 +28,38 @@ in the downloaded module — it covers the extra manifest patch a Coop
 dedicated server needs to actually activate this module, verification steps,
 and what to redo after a Coop update.
 
+## Garrison templates and surplus guards
+
+The Template page shows **Actual garrison** (stationed troops, wounded counts,
+and current troops / capacity) separately from **Template targets** (the desired
+composition). **Add troops** edits those targets; it does not add or remove real
+soldiers.
+
+Under Guard Parties, **Auto-create guards from surplus troops** is off by default.
+When enabled, it creates a guard using the configured **Automatic guard creation
+party size**, drawn only from healthy troops above template targets or outside
+the template. Troops that can upgrade into still-needed targets are reserved.
+Unlimited targets retain their troops and upgradeable recruits. Heroes and
+wounded troops stay in the garrison.
+
+The garrison waits until a full eligible batch is available, no guard already
+exists, and the settlement is not under siege or raid. An empty or missing
+template causes no transfers. This mode uses the guard-party size, not the
+ordinary total-garrison creation threshold, and takes priority over ordinary
+automatic patrol selection. Guard replenishment also respects template needs
+while this option is enabled; the separate village-defense setting remains
+independent.
+
+| Surplus guards | Automatic removal | Unneeded troops |
+|---|---|---|
+| Off | Off | Stay in the garrison. |
+| On | Off | Form a guard when the conditions above are met. |
+| Off | On | Follow the existing automatic-removal behavior. |
+| On | On | Wait for guards; automatic removal does not dismiss them. |
+
+Disabling surplus guards leaves existing guard parties alone. Normal guard
+orders and other independently enabled management features continue to apply.
+
 ## This repository
 
 This repo is the module's source/build tree, not something you need to

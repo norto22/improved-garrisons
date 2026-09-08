@@ -295,6 +295,9 @@ namespace ImprovedGarrisons.CoopIntegration.Runtime
                 case SettingsIntentKind.ToggleAutoGuards:
                     MobileGarrisonSettings.Instance.ToggleAutoGuards(town, request.BooleanArgument);
                     break;
+                case SettingsIntentKind.ToggleAutoGuardsFromExcess:
+                    MobileGarrisonSettings.Instance.ToggleAutoGuardsFromExcess(town, request.BooleanArgument);
+                    break;
                 case SettingsIntentKind.ToggleAutoGuardDefend:
                     MobileGarrisonSettings.Instance.ToggleAutoGuardDefend(town, request.BooleanArgument);
                     break;

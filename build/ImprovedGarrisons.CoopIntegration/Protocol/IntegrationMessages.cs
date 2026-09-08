@@ -57,7 +57,8 @@ namespace ImprovedGarrisons.CoopIntegration.Protocol
         RemoveUpgradeTarget = 29,
         SetTemplateFull = 30,
         SetUpgradePath = 31,
-        AdjustTemplateCount = 32
+        AdjustTemplateCount = 32,
+        ToggleAutoGuardsFromExcess = 33
     }
 
     public enum ManagementIntentKind

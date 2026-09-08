@@ -379,6 +379,41 @@ namespace ImprovedGarrisons.AI.AIManagers
 			return null;
 		}
 
+		public PartyBase CreateMobileGarrisonFromExcess(Settlement forSettlement)
+		{
+			PartyBase createdParty = null;
+			try
+			{
+				if (forSettlement == null || forSettlement.IsVillage || forSettlement.IsHideout
+					|| forSettlement.IsUnderRaid || forSettlement.IsUnderSiege || forSettlement.Town?.GarrisonParty == null
+					|| GetMobileGarrisonPartyOfSettlement(forSettlement) != null)
+				{
+					return null;
+				}
+				GarrisonSettings settings = Main.GarrisonBehavior.GetTownSettings(forSettlement.Town);
+				bool transferred = TemplateSurplusTroops.TryCreateGuard(forSettlement.Town.GarrisonParty.MemberRoster, settings, true, delegate
+				{
+					createdParty = CreateMobileGarrison(forSettlement, forSettlement);
+					return createdParty?.MemberRoster;
+				});
+				if (transferred)
+				{
+					GetMobileGarrisonPartyOfSettlement(forSettlement).InitializeInitialTroopRoster(withReset: true);
+					return createdParty;
+				}
+			}
+			catch (Exception ex)
+			{
+				LogFileManager.WriteErrorLogEntry(MethodBase.GetCurrentMethod().Name, ex);
+			}
+			// A rejected or rolled-back transfer must not leave an empty guard registered.
+			if (createdParty != null && createdParty.MemberRoster.TotalManCount == 0)
+			{
+				GetMobileGarrisonPartyOfSettlement(forSettlement)?.RemoveMobileGarrison(forceRemove: true);
+			}
+			return null;
+		}
+
 		public bool IsMobileGarrisonParty(MobileParty party)
 		{
 			if (party != null && party.StringId != null)

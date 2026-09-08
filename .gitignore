@@ -4,7 +4,16 @@
 .codegraph/
 build/**/bin/
 build/**/obj/
-tests/
+tests/*
+!tests/coop-runtime-contract/
+tests/coop-runtime-contract/*
+!tests/coop-runtime-contract/TemplateSurplusTests.cs
+!tests/coop-runtime-contract/SurplusGuardSettingsTests.cs
+!tests/coop-runtime-contract/GarrisonDisplayTests.cs
+!tests/coop-runtime-contract/host/
+tests/coop-runtime-contract/host/*
+!tests/coop-runtime-contract/host/Program.cs
+!tests/coop-runtime-contract/host/ImprovedGarrisons.CoopRuntimeContract.Host.csproj
 docs/
 releases/
 dist/

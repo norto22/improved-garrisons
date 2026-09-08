@@ -356,6 +356,8 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
                         allSettings[key] = current;
                     }
 
+                    // Legacy snapshots omit this opt-in field, including when reusing an existing object.
+                    current.GuardsAutoSpawnFromExcess = false;
                     continue;
                 }
 

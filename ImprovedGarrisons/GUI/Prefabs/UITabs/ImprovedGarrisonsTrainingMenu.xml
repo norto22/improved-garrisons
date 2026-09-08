@@ -35,7 +35,7 @@
                         </Widget>
 
                         <!-- Left Content Section -->
-                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" SuggestedHeight="390" VerticalAlignment="Top" MarginTop="40" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="275" VerticalAlignment="Top" MarginTop="40" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
                             <Children>
 
                                  <!-- Title 
@@ -94,6 +94,43 @@
                                     </Children>
                                 </BrushWidget>   -->     
 
+                            </Children>
+                        </Widget>
+
+                        <!-- Actual stationed troops: read-only, independent of template targets. -->
+                        <Widget DataSource="{ActualGarrison}" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="330" MarginLeft="10" MarginRight="20" MarginBottom="10">
+                            <Children>
+                                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" LayoutImp.LayoutMethod="VerticalTopToBottom" DoNotAcceptEvents="true">
+                                    <Children>
+                                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="Recruitment.Popup.Title.Text" Text="@Title" DoNotAcceptEvents="true" />
+                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="SPOptions.OptionName.Text" Brush.FontSize="20" Text="@CountText" MarginTop="5" MarginBottom="10" DoNotAcceptEvents="true" />
+                                        <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="Fixed" SuggestedHeight="7" Sprite="SPGeneral\TownManagement\title_divider" AlphaFactor="0.7" />
+                                    </Children>
+                                </ListPanel>
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginTop="80">
+                                    <Children>
+                                        <ScrollablePanel WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" AutoHideScrollBars="true" ClipRect="ClipRect" InnerPanel="ClipRect\GarrisonList" VerticalScrollbar="..\GarrisonScrollbar\Scrollbar" MarginRight="10">
+                                            <Children>
+                                                <Widget Id="ClipRect" WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" ClipContents="true">
+                                                    <Children>
+                                                        <ListPanel DataSource="{Troops}" Id="GarrisonList" WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" LayoutImp.LayoutMethod="VerticalTopToBottom" DoNotAcceptEvents="true">
+                                                            <ItemTemplate>
+                                                                <ListPanel WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" LayoutImp.LayoutMethod="VerticalTopToBottom" MarginBottom="15" DoNotAcceptEvents="true">
+                                                                    <Children>
+                                                                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="GameMenu.ManageHideoutTroops.NameText" Text="@Name" DoNotAcceptEvents="true" />
+                                                                        <TextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="SPOptions.OptionName.Text" Brush.FontSize="18" Text="@CountText" MarginTop="5" DoNotAcceptEvents="true" />
+                                                                    </Children>
+                                                                </ListPanel>
+                                                            </ItemTemplate>
+                                                        </ListPanel>
+                                                    </Children>
+                                                </Widget>
+                                            </Children>
+                                        </ScrollablePanel>
+                                        <Standard.VerticalScrollbar Id="GarrisonScrollbar" WidthSizePolicy="CoverChildren" HeightSizePolicy="StretchToParent" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                        <RichTextWidget WidthSizePolicy="StretchToParent" HeightSizePolicy="CoverChildren" Brush="SPOptions.OptionName.Text" Brush.FontSize="20" Text="@EmptyText" IsVisible="@IsEmpty" DoNotAcceptEvents="true" />
+                                    </Children>
+                                </Widget>
                             </Children>
                         </Widget>
 
