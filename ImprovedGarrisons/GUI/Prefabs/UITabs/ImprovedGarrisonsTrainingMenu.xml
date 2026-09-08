@@ -9,7 +9,7 @@
             <Children>
 
                 <!-- Left Content Section -->
-                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="300" MarginTop="10" MarginLeft="10" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
+                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="340" MarginTop="10" MarginLeft="10" Sprite="BlankWhiteSquare_9" Color="#999999FF" AlphaFactor="0.0">
                     <Children>
 
                         <!-- Vertical Divider -->
@@ -51,7 +51,7 @@
                                 </Widget> -->
 
                                 <!-- Left Button Listpanel -->
-                                <Widget WidthSizePolicy="Fixed" HeightSizePolicy="StretchToParent" SuggestedWidth="328" MarginBottom="10" HorizontalAlignment="Left" >
+                                <Widget WidthSizePolicy="StretchToParent" HeightSizePolicy="StretchToParent" MarginBottom="10" HorizontalAlignment="Left" >
                                     <Children>
 
                                         <ImprovedGarrisonsBottomListPanel Parameter.ContentDataSource="{TrainingSettingsVM}" Parameter.FontSize="20" Parameter.FrameSize="30" Parameter.FrameMarginLeft="10" Parameter.FrameMarginRight="40" Parameter.SliderFrameSize="252" Parameter.SliderFillerSize="235" Parameter.SliderButtonFrameSize="290" Parameter.EnableTopDivider="false" Parameter.TextFrameWidth="230" />

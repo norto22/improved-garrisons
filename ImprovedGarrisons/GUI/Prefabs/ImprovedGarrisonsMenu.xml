@@ -1,6 +1,6 @@
 <Prefab>
   <Constants>
-    <Constant Name="NavigationWidth" Value="310" />
+    <Constant Name="NavigationWidth" Value="270" />
   </Constants>
   <VisualDefinitions>
     <VisualDefinition Name="Menu" EaseIn="true" TransitionDuration="0.45">
@@ -115,7 +115,7 @@
                                                         <Children>
                                                           <Widget HeightSizePolicy="CoverChildren" WidthSizePolicy="CoverChildren" VerticalAlignment="Center">
                                                             <Children>
-                                                              <ListPanel DataSource="{CurrentHint}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren"  SuggestedWidth="270" VerticalAlignment="Center" HorizontalAlignment="Center" UpdateChildrenStates="true" Sprite="BlankWhiteSquare_9" MarginLeft="10" MarginRight="10" Color="#3b2b20FF" AlphaFactor="0" LayoutImp.LayoutMethod="VerticalBottomToTop">
+                                                              <ListPanel DataSource="{CurrentHint}" WidthSizePolicy="Fixed" HeightSizePolicy="CoverChildren"  SuggestedWidth="230" VerticalAlignment="Center" HorizontalAlignment="Center" UpdateChildrenStates="true" Sprite="BlankWhiteSquare_9" MarginLeft="10" MarginRight="10" Color="#3b2b20FF" AlphaFactor="0" LayoutImp.LayoutMethod="VerticalBottomToTop">
                                                                   <Children>
 
                                                                       <ListPanel WidthSizePolicy="CoverChildren" HeightSizePolicy="CoverChildren" HorizontalAlignment="Center"  >

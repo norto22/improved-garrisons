@@ -130,7 +130,8 @@ namespace ImprovedGarrisons.CoopIntegration.Persistence
 
         private static void PollServer()
         {
-            if (Campaign.Current == null || global::ImprovedGarrisons.Main.PartyManagement == null)
+            if (Campaign.Current == null || global::ImprovedGarrisons.Main.PartyManagement == null
+                || !IntegrationRuntime.ServerCampaignReady)
             {
                 return;
             }

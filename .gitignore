@@ -11,6 +11,7 @@ tests/coop-runtime-contract/*
 !tests/coop-runtime-contract/SurplusGuardSettingsTests.cs
 !tests/coop-runtime-contract/GarrisonDisplayTests.cs
 !tests/coop-runtime-contract/TemplateEditorReadinessTests.cs
+!tests/coop-runtime-contract/SettingsPersistenceTests.cs
 !tests/coop-runtime-contract/host/
 tests/coop-runtime-contract/host/*
 !tests/coop-runtime-contract/host/Program.cs

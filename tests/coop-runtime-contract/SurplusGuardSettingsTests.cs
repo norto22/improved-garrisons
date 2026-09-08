@@ -321,6 +321,10 @@ public static partial class ContractRunner
 
         protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
         {
+            if (targetMethod?.Name == "get_Players")
+            {
+                return Player == null ? Array.Empty<Player>() : new[] { Player };
+            }
             if (targetMethod?.Name == "TryGetPlayer" && args != null)
             {
                 args[1] = Player;

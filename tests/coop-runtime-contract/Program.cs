@@ -13,6 +13,8 @@ using Coop.Core.Client;
 using Coop.Core.Client.States;
 using Coop.Core.Common;
 using Coop.Core.Server.Connections;
+using Coop.Core.Server;
+using Coop.Core.Server.States;
 using GameInterface;
 using GameInterface.Services.GameState.Interfaces;
 using GameInterface.Services.Players.Data;
@@ -32,6 +34,10 @@ public static partial class ContractRunner
 
     public static int Run()
     {
+        string? previousDataDirectory = Environment.GetEnvironmentVariable("BANNERLORD_USER_DIR");
+        string testDataDirectory = Path.Combine(Path.GetTempPath(), "ig-contract-state-" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(testDataDirectory);
+        Environment.SetEnvironmentVariable("BANNERLORD_USER_DIR", testDataDirectory);
         try
         {
             GameThread.Instance.MarkGameThread();
@@ -54,6 +60,7 @@ public static partial class ContractRunner
             TestClientRevisionResetsAfterServerRestart();
             TestServerClanRegistryTreatsRegisteredClanAsPlayerOwned();
             TestDocumentsRootFallsBackWhenPlatformHelperLacksDocumentsPath();
+            RunSettingsPersistenceTests();
             Console.WriteLine($"PASS {TestName}");
             return 0;
         }
@@ -66,6 +73,8 @@ public static partial class ContractRunner
         {
             ContainerProvider.Clear();
             GameThread.Instance.UnmarkGameThread();
+            Environment.SetEnvironmentVariable("BANNERLORD_USER_DIR", previousDataDirectory);
+            Directory.Delete(testDataDirectory, recursive: true);
         }
     }
 
@@ -443,6 +452,8 @@ public static partial class ContractRunner
 
     private static void TestServerSubscribesAndRepliesThroughCoopNetwork()
     {
+        using SettingsTownFixture fixture = new();
+        Main.GarrisonBehavior.SettlementSettingsData.Clear();
         ModInformation.IsServer = true;
         MessageBroker broker = new();
         RecordingNetwork network = new();
@@ -489,6 +500,26 @@ public static partial class ContractRunner
         builder.RegisterInstance(broker).As<IMessageBroker>();
         builder.RegisterInstance(network).As<INetwork>();
         builder.RegisterInstance(mapper).As<ISerializableTypeMapper>();
+        if (ModInformation.IsServer)
+        {
+            builder.RegisterInstance(DispatchProxy.Create<IServerLogic, SettingsServerLogicProxy>()).As<IServerLogic>();
+        }
+    }
+
+    public class SettingsServerLogicProxy : DispatchProxy
+    {
+        public IServerState? State { get; set; } = CreateSettingsRunningState();
+
+        protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+        {
+            return targetMethod?.Name == "get_State" ? State : null;
+        }
+    }
+
+    private static ServerRunningState CreateSettingsRunningState()
+    {
+        return new ServerRunningState(CreateDefaultProxy<IServerLogic>(), new MessageBroker(),
+            new RecordingNetwork(), CreateDefaultProxy<IGameStateInterface>(), CreateDefaultProxy<ILoadingInterface>());
     }
 
     // Shared client-side connection setup used by every test that needs the transport hooked up as a
